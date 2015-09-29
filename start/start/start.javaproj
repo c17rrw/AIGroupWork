@@ -5,13 +5,13 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>eda7074c-7bd2-44b8-93b8-6642c3ea072c</ProjectGuid>
+    <ProjectGuid>ec866744-bc2b-4d84-a5dd-f05ab45d9648</ProjectGuid>
     <OutputType>jar</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HelloWorld</RootNamespace>
-    <AssemblyName>HelloWorld</AssemblyName>
+    <RootNamespace>start</RootNamespace>
+    <AssemblyName>start</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <Name>HelloWorld</Name>
+    <Name>start</Name>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
@@ -45,21 +45,12 @@
   </PropertyGroup>
   <ItemGroup>
     <SourceFolder Include="src\main\java\" />
-    <None Include="packages.config" />
-    <None Include="src\main\java\main\Start.java" />
+    <None Include="**\*.*" Exclude="bin\**\*.*;obj\**\*.*;out\**\*.*;*.user;*.javaproj;*.vspscc;*.vsscc;*.vssscc" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="src\main\java\main\route.txt">
-      <SubType>Content</SubType>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="src\main\java\main\Start.java">
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
