@@ -57,6 +57,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\main\java\main\RouteSearch.java">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="src\main\java\main\Start.java">
       <SubType>Code</SubType>
     </Compile>

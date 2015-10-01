@@ -16,5 +16,6 @@ visits every city and takes the shortest distance.
 
 	public static void main(String[] s) {
 		System.out.println("Hello, World!");
+		RouteSearch routeSearch = new RouteSearch();
 	}
 }
