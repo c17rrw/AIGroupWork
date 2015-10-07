@@ -3,10 +3,14 @@ import java.util.Random;
 /**
 TODO.
 	How to encode solutions [Genotype]
-	What level of randomness to have for mutating
-	How large should population be
+		0-Aberdeen
+		1-ayr
+		2-Edinburgh
+		3-fortwilliam
+		4-Glasgow
+		5-inverness
+		6-standrews
 	How to splice parent genes
-	How many of the fittest to keep
 **/
 
 /**
@@ -14,63 +18,97 @@ TODO.
 **/
 public class RouteSearch{
 	
-	private final int MAX_POPULATION_SIZE = 4;
+	private int MAX_POPULATION_SIZE, KEEP_TOP_N_FITTEST_SOLUTIONS;
+	private double MUTATION_CHANCE;
 	
 	private Random random;
 	
-	Object[] currentPopulation;
-	Object[] newSolution;
-	int[] newPopulationScores;
+	private String[] currentPopulation;
+	private String[] newPopulation;
 	
 	public RouteSearch(){
+		RouteSearch(10,0.01,6);
+	}
+	
+	public RouteSearch(int maxPopulationSize, int mutationChance, int keepTopNFittestSolutions){
+		MAX_POPULATION_SIZE = maxPopulationSize;
+		MUTATION_CHANCE = mutationChance;
+		KEEP_TOP_N_FITTEST_SOLUTIONS = keeptopNFittestSolutions;
 		System.out.println("Have created a route search algorithm");
 		random = new Random();
 		generateInitialPopulation();
 	}
 	
-	/**TODO**/
+	/**TODO.
+		Randomize the initial population's genotypes
+	**/
 	private void generateInitialPopulation(){
-		currentPopulation = new Object[MAX_POPULATION_SIZE];
+		currentPopulation = new String[MAX_POPULATION_SIZE];
+		for(int i = 0; i< currentPopulation.length; i++){
+			currentPopulation = "01234560";
+		}
 	}
 	
-	/**TODO**/
+	/**TODO.
+		Untested
+	**/
 	public void iterateOneStep(){
-		Object[] newPopulation = currentPopulation;
-		calculateFitnessOfAll(newPopulation);
-		keepFittestSolutions(newPopulation, newPopulationScores);
-		generateNewSolutions();
+		int[] currentPopulationScores = calculateFitnessOfAll(currentPopulation);
+		String[] fittestSolutions = keepFittestSolutions(currentPopulation, currentPopulationScores);
+		String[] newSolutions = generateNewSolutions(fittestSolutions);
+		currentPopulation = concatenateArrays(fittestSolutions, newSolutions);
+	}
+	
+	/**TODO.
+		Untested
+	**/
+	private String[] concatenateArrays(String[] a1, String[] a2){
+		String[] fullArray = new String[a1.length+a2.length];
+		int fullArrayPos = 0;
+		for(int i = 0; i < a1.length; i++){
+			fullArray[fullArrayPos++] = a1[i];
+		}
+		for(int i = 0; i < a2.length; i++){
+			fullArray[fullArrayPos++] = a2[i];
+		}
+		return fullArray;
 	}
 	
 	/**TODO**/
-	private void calculateFitnessOfAll(Object[] newPopulation){
+	private int[] calculateFitnessOfAll(String[] newPopulation){
 		newPopulationScores = new int[MAX_POPULATION_SIZE];
 		for(int i = 0; i < newPopulation.length; i++){
 			newPopulationScores[i] = calculateFitnessOfOne(newPopulation[i]);
 		}
+		return newPopulationScores;
 	}
 	
 	/**TODO**/
-	private int calculateFitnessOfOne(Object solution){
+	private int calculateFitnessOfOne(String solution){
 		return 0;
 	}
 	
 	/**TODO**/
-	private void keepFittestSolutions(Object[] newPopulation, int[] newPopulationScores){
-	
+	private String[] keepFittestSolutions(String[] newPopulation, int[] newPopulationScores){
+		return new String[KEEP_TOP_N_FITTEST_SOLUTIONS];
 	}
 	
 	/**TODO**/
-	private void generateNewSolutions(){
-	
+	private String[] generateNewSolutions(String[] parentStock){
+		return new String[MAX_POPULATION_SIZE-KEEP_TOP_N_FITTEST_SOLUTIONS];
 	}
 	
-	/**TODO**/
-	private Object makeChild(Object mother, Object father){
-		return new Object();
+	/**TODO.
+		How to ensure a new child is valid?
+	**/
+	private String makeChild(String mother, String father){
+		return "";
 	}
 	
-	/**TODO**/
-	private Object mutateChild(Object child){
-		return random.nextBoolean() ? child : new Object();
+	/**TODO.
+		Random generator is wrong
+	**/
+	private String mutateChild(String child){
+		return random.nextDouble % MUTATION_CHANCE == 0 ? child : "";
 	}
 }
