@@ -18,7 +18,8 @@ TODO.
 **/
 public class RouteSearch{
 	
-	private int MAX_POPULATION_SIZE, KEEP_TOP_N_FITTEST_SOLUTIONS;
+	private int MAX_POPULATION_SIZE;
+	private int KEEP_TOP_N_FITTEST_SOLUTIONS;
 	private double MUTATION_CHANCE;
 	
 	private Random random;
@@ -27,13 +28,13 @@ public class RouteSearch{
 	private String[] newPopulation;
 	
 	public RouteSearch(){
-		RouteSearch(10,0.01,6);
+		this(10,0.01,6);
 	}
 	
-	public RouteSearch(int maxPopulationSize, int mutationChance, int keepTopNFittestSolutions){
+	public RouteSearch(int maxPopulationSize, double mutationChance, int keepTopNFittestSolutions){
 		MAX_POPULATION_SIZE = maxPopulationSize;
 		MUTATION_CHANCE = mutationChance;
-		KEEP_TOP_N_FITTEST_SOLUTIONS = keeptopNFittestSolutions;
+		KEEP_TOP_N_FITTEST_SOLUTIONS = keepTopNFittestSolutions;
 		System.out.println("Have created a route search algorithm");
 		random = new Random();
 		generateInitialPopulation();
@@ -45,7 +46,7 @@ public class RouteSearch{
 	private void generateInitialPopulation(){
 		currentPopulation = new String[MAX_POPULATION_SIZE];
 		for(int i = 0; i< currentPopulation.length; i++){
-			currentPopulation = "01234560";
+			currentPopulation[i] = "01234560";
 		}
 	}
 	
@@ -76,7 +77,7 @@ public class RouteSearch{
 	
 	/**TODO**/
 	private int[] calculateFitnessOfAll(String[] newPopulation){
-		newPopulationScores = new int[MAX_POPULATION_SIZE];
+		int[] newPopulationScores = new int[MAX_POPULATION_SIZE];
 		for(int i = 0; i < newPopulation.length; i++){
 			newPopulationScores[i] = calculateFitnessOfOne(newPopulation[i]);
 		}
@@ -109,6 +110,6 @@ public class RouteSearch{
 		Random generator is wrong
 	**/
 	private String mutateChild(String child){
-		return random.nextDouble % MUTATION_CHANCE == 0 ? child : "";
+		return random.nextDouble() % MUTATION_CHANCE == 0.0 ? child : "";
 	}
 }
