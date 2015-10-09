@@ -26,6 +26,7 @@ public class RouteSearch{
 	
 	private String[] currentPopulation;
 	private String[] newPopulation;
+	private String currentBestGenotype;
 	
 	public RouteSearch(){
 		this(10,0.01,6);
@@ -35,7 +36,6 @@ public class RouteSearch{
 		MAX_POPULATION_SIZE = maxPopulationSize;
 		MUTATION_CHANCE = mutationChance;
 		KEEP_TOP_N_FITTEST_SOLUTIONS = keepTopNFittestSolutions;
-		System.out.println("Have created a route search algorithm");
 		random = new Random();
 		generateInitialPopulation();
 	}
@@ -53,11 +53,20 @@ public class RouteSearch{
 	/**TODO.
 		Untested
 	**/
-	public void iterateOneStep(){
+	public String[] iterateOneStep(){
 		int[] currentPopulationScores = calculateFitnessOfAll(currentPopulation);
 		String[] fittestSolutions = keepFittestSolutions(currentPopulation, currentPopulationScores);
 		String[] newSolutions = generateNewSolutions(fittestSolutions);
 		currentPopulation = concatenateArrays(fittestSolutions, newSolutions);
+		return currentPopulation;
+	}
+	
+	public String getCurrentBestGenotype(){
+		return currentBestGenotype;
+	}
+	
+	public int getCurrentBestGenotypeScore(){
+		return calculateFitnessOfOne(currentBestGenotype);
 	}
 	
 	/**TODO.
@@ -89,7 +98,9 @@ public class RouteSearch{
 		return 0;
 	}
 	
-	/**TODO**/
+	/**TODO.
+		Roulette wheel?
+	**/
 	private String[] keepFittestSolutions(String[] newPopulation, int[] newPopulationScores){
 		return new String[KEEP_TOP_N_FITTEST_SOLUTIONS];
 	}
