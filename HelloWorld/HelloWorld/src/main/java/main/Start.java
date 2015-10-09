@@ -57,18 +57,7 @@ visits every city and takes the shortest distance.
 		double mutationChance = 0.001;
 		int amountOfFittestPopulationToKeep = 4;
 		int iterationCount = 50;
-		RouteSearch routeSearch = new RouteSearch(maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep);
-		long startTime = System.currentTimeMillis();
-		for(int k = 0; k < iterationCount; k++){
-			routeSearch.iterateOneStep();
-		}
-		long totalTime = System.currentTimeMillis() - startTime;
-		System.out.println(
-		"P: "+maxPopulationSize+
-		"\tM: "+mutationChance+"\tI:"+iterationCount +
-		"\tB: "+routeSearch.getCurrentBestGenotype()+
-		"("+routeSearch.getCurrentBestGenotypeScore()+")"+
-		"\tT:" + totalTime);
+		runTheGAWithParams(maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep, iterationCount);
 	}
 	
 	public static void runEntireTestSuite(){
@@ -79,23 +68,28 @@ visits every city and takes the shortest distance.
 					int amountOfFittestPopulationToKeep = maxPopulationSize * fitnessKeepPercent / 100;
 					for(int iterationCount : ITERATION_AMOUNTS){
 						for(int j = 0; j < REPEAT_THIS_GA_FOR_STATISTICS; j++){
-							RouteSearch routeSearch = new RouteSearch(maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep);
-							long startTime = System.currentTimeMillis();
-							for(int k = 0; k < iterationCount; k++){
-								routeSearch.iterateOneStep();
-							}
-							long totalTime = System.currentTimeMillis() - startTime;
-							System.out.println(
-							"P: "+maxPopulationSize+
-							"\tM: "+mutationChance+"\tI:"+iterationCount +
-							"\tB: "+routeSearch.getCurrentBestGenotype()+
-							"("+routeSearch.getCurrentBestGenotypeScore()+")"+
-							"\tT:" + totalTime);
+							runTheGAWithParams(maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep, iterationCount);
 						}						
 					}
 				}
 			}
 		}
 		System.out.println("Total Time Elapsed: " + (System.currentTimeMillis()-suiteStart) + "ms");
+	}
+
+	public static void runTheGAWithParams(int maxPopulationSize, double mutationChance, int amountOfFittestPopulationToKeep, int iterationCount){
+		RouteSearch routeSearch = new RouteSearch(maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep);
+		long startTime = System.currentTimeMillis();
+		for(int k = 0; k < iterationCount; k++){
+			routeSearch.iterateOneStep();
+		}
+		long totalTime = System.currentTimeMillis() - startTime;
+		System.out.println(
+		"P: "+maxPopulationSize+
+		"\tM: "+mutationChance+"\tI:"+iterationCount +
+		"\tR: "+amountOfFittestPopulationToKeep+
+		"\tB: "+routeSearch.getCurrentBestGenotype()+
+		"("+routeSearch.getCurrentBestGenotypeScore()+")"+
+		"\tT:" + totalTime);
 	}
 }
