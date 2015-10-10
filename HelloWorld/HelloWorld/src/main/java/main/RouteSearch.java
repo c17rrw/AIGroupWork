@@ -10,6 +10,7 @@ TODO.
 		4-Glasgow
 		5-inverness
 		6-standrews
+		7-stirling
 	How to splice parent genes
 **/
 
@@ -24,29 +25,29 @@ public class RouteSearch{
 	
 	private Random random;
 	
+	private int[][] distancesMatrix;
+	
 	private String[] currentPopulation;
 	private String[] newPopulation;
 	private String currentBestGenotype;
-	
-	public RouteSearch(){
-		this(10,0.01,6);
-	}
-	
-	public RouteSearch(int maxPopulationSize, double mutationChance, int keepTopNFittestSolutions){
+		
+	public RouteSearch(int maxPopulationSize, double mutationChance, int keepTopNFittestSolutions, int[][] distancesMatrix){
 		MAX_POPULATION_SIZE = maxPopulationSize;
 		MUTATION_CHANCE = mutationChance;
 		KEEP_TOP_N_FITTEST_SOLUTIONS = keepTopNFittestSolutions;
+		this.distancesMatrix = distancesMatrix;
 		random = new Random();
 		generateInitialPopulation();
 	}
 	
 	/**TODO.
 		Randomize the initial population's genotypes
+		Need to ensure is valid, i.e. starts and ends at edinburgh, no repeats
 	**/
 	private void generateInitialPopulation(){
 		currentPopulation = new String[MAX_POPULATION_SIZE];
 		for(int i = 0; i< currentPopulation.length; i++){
-			currentPopulation[i] = "01234560";
+			currentPopulation[i] = "012345670";
 		}
 	}
 	
@@ -93,9 +94,21 @@ public class RouteSearch{
 		return newPopulationScores;
 	}
 	
-	/**TODO**/
+	/**TODO.
+		Needs testing.
+	**/
 	private int calculateFitnessOfOne(String solution){
-		return 0;
+		String[] routeLocationStrings = solution.split("");
+		for(int i = 0; i <routeLocationStrings.length; i++){
+			System.out.println(""+i+": "+routeLocationStrings[i]);
+		}
+		int totalDistance = 0;
+		for(int i = 2; i < routeLocationStrings.length; i++){
+			int currentLocation = Integer.parseInt(routeLocationStrings[i]);
+			int previousLocation = Integer.parseInt(routeLocationStrings[i-1]);
+			totalDistance += distancesMatrix[currentLocation][previousLocation];
+		}
+		return totalDistance;
 	}
 	
 	/**TODO.

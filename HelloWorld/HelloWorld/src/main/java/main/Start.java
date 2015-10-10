@@ -17,6 +17,7 @@ visits every city and takes the shortest distance.
 	private static final int[] FITNESS_KEEPING_AMOUNT = {20, 40, 60};
 	private static final int[] ITERATION_AMOUNTS = {10, 50, 100, 500, 1000};
 	
+	private static int[][] distancesMatrix;
 	
 	/** Repetitions.
 		We need to repeat across may iterations with different
@@ -48,8 +49,29 @@ visits every city and takes the shortest distance.
 	**			[probably only used in fitness calculation]
 	**/
 	public static void main(String[] s) {
+		//distancesMatrix = readDistancesMatrix("route.txt");
+		distancesMatrix = readDistancesMatrix("route.alt.txt");
 		//runEntireTestSuite();
 		testQASingleRun();
+	}
+	
+	/**TODO.
+		Read the distance matrix in and convert it into a 2-d array
+		e.g. [0][1] = position of 1st item on row 0 of text file = 179
+		To read: Select row as FROM, Select column as TO
+		[0][1] is the distance from city 0 to city 1
+		         ABD AYR   EDI   FTW   GLS   INV   STA   STR
+			ABD  0   179   129   157   146   105   79    119
+			AYR  179 0     79    141   33    207   118   64
+			EDI  129 79    0     131   43    154   50    36      
+			FTW  157 141   131   0     116   74*   134   98
+			GLS  146 33    43    116   0     175   81    27
+			INV  105 207   154   64*   175   0     145   143
+			STA  79  118   50    134   81    145   0     143
+			STR  119 64    36    96    27    143   52    0   
+	**/
+	public static int[][] readDistancesMatrix(String location){
+		return new int[][] {{0}};
 	}
 	
 	public static void testQASingleRun(){
@@ -78,7 +100,7 @@ visits every city and takes the shortest distance.
 	}
 
 	public static void runTheGAWithParams(int maxPopulationSize, double mutationChance, int amountOfFittestPopulationToKeep, int iterationCount){
-		RouteSearch routeSearch = new RouteSearch(maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep);
+		RouteSearch routeSearch = new RouteSearch(maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep, distancesMatrix);
 		long startTime = System.currentTimeMillis();
 		for(int k = 0; k < iterationCount; k++){
 			routeSearch.iterateOneStep();
