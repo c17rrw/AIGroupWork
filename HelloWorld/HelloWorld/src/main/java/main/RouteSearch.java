@@ -123,11 +123,69 @@ public class RouteSearch{
 		return new String[MAX_POPULATION_SIZE-KEEP_TOP_N_FITTEST_SOLUTIONS];
 	}
 	
-	/**TODO.
-		How to ensure a new child is valid?
-	**/
 	private String makeChild(String mother, String father){
-		return "";
+		String child = "";
+		
+		int crossoverPoint = random.nextInt(mother.length());
+		child = mother.substring(0, crossoverPoint) +
+				father.substring(crossoverPoint);
+				
+		boolean[] visitedLocations = {false,false,false,false,false,false,false,false};
+		boolean[] visitedTwiceLocations = {false,false,false,false,false,false,false,false};
+		
+		for(int i = 0; i < child.length()-1; i++){
+			int currentLocation = Integer.parseInt(String.valueOf(child.charAt(i)));
+			if(visitedLocations[currentLocation]){
+				visitedTwiceLocations[currentLocation] = true;
+			} else {
+				visitedLocations[currentLocation] = true;
+			}
+		}
+		
+		child = removeDuplicatesFromChild(child, visitedTwiceLocations);
+		child = insertMissingIntoChild(child, mother, father, visitedLocations);
+		
+		return mutateChild(child);
+	}
+	
+	private String removeDuplicatesFromChild(String child, boolean[] duplicates){
+		for(int i = 1; i < duplicates.length; i++){
+			if(duplicates[i]){
+				int positionOfDuplicate;
+				if(random.nextBoolean()){
+					positionOfDuplicate = child.indexOf(""+i);
+				}else{
+					positionOfDuplicate = child.lastIndexOf(""+i);
+				}
+				child = child.substring(0, positionOfDuplicate) + 
+						child.substring(positionOfDuplicate+1);
+			}
+		}
+		return child;
+	}
+	
+	private String insertMissingIntoChild(String child, String mother, String father, boolean[] visitedLocations){
+		for(int i = 1; i < visitedLocations.length; i++){
+			if(!visitedLocations[i]){
+				String chosenParent;
+				if(random.nextBoolean()){
+					chosenParent = mother;
+				} else {
+					chosenParent = father;
+				}
+				int positionOfNumberNextToCurrentInParent = chosenParent.indexOf(""+i)-1;
+				String numberNextToCurrentInParent = String.valueOf(chosenParent.charAt(positionOfNumberNextToCurrentInParent));
+				int positionToPlaceAt = child.indexOf(numberNextToCurrentInParent);
+				if(positionToPlaceAt < 0){
+					child = child.substring(0, child.length()-1) + i + "0";
+				} else if(positionToPlaceAt==0){
+					child = "0" + i + child.substring(1);
+				} else {
+					child = child.substring(0, positionToPlaceAt) + i + child.substring(positionToPlaceAt);
+				}
+			}
+		}
+		return child;
 	}
 	
 	private String mutateChild(String child){
