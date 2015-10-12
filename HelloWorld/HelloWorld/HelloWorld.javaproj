@@ -52,6 +52,9 @@
     <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="src\main\java\main\route.alt.txt">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="src\main\java\main\route.txt">
       <SubType>Content</SubType>
     </Content>

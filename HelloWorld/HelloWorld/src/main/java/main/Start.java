@@ -53,7 +53,7 @@ visits every city and takes the shortest distance.
 		distancesMatrix = readDistancesMatrix("route.alt.txt");
 		//runEntireTestSuite();
 		testQASingleRun();
-	}
+		}
 	
 	/**TODO.
 		Read the distance matrix in and convert it into a 2-d array
@@ -95,6 +95,7 @@ visits every city and takes the shortest distance.
 				integerArrayData[i][j] = Integer.parseInt(rawArrayData[i][j]);
 			}
 		}
+		
 		return integerArrayData;
 	}
 	

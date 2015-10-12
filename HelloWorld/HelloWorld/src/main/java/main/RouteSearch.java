@@ -19,6 +19,8 @@ TODO.
 **/
 public class RouteSearch{
 	
+	
+	
 	private int MAX_POPULATION_SIZE;
 	private int KEEP_TOP_N_FITTEST_SOLUTIONS;
 	private double MUTATION_CHANCE;
@@ -26,6 +28,7 @@ public class RouteSearch{
 	private Random random;
 	
 	private int[][] distancesMatrix;
+	public int numberOfCities = 8;
 	
 	private String[] currentPopulation;
 	private String currentBestGenotype;
@@ -46,12 +49,32 @@ public class RouteSearch{
 	private void generateInitialPopulation(){
 
 	currentBestGenotype = "";
-
+		
+		int chromosome, i, thisCity, refLength;
 		currentPopulation = new String[MAX_POPULATION_SIZE];
-		for(int i = 0; i< currentPopulation.length; i++){
+		
+		for(chromosome = 0; chromosome < numberOfCities; chromosome++ ){
+						
+			for( i = 0; i < numberOfCities; i++){
 			currentPopulation[i] = "012345670";
+			
+			}
+			
+			refLength = numberOfCities;
+			
+			for (i = 0; i < numberOfCities; i++){
+				thisCity = random.nextInt(refLength);
+				currentPopulation[i] = currentPopulation[thisCity];
+				currentPopulation[thisCity] = currentPopulation[refLength - 1];
+				refLength--;
+			}
+			
 		}
+		
+		
+		System.out.println(""+ currentPopulation.length );
 	}
+	
 	
 	/**TODO.
 		Untested
