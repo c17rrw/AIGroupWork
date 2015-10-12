@@ -45,6 +45,9 @@ public class RouteSearch{
 		Need to ensure is valid, i.e. starts and ends at edinburgh, no repeats
 	**/
 	private void generateInitialPopulation(){
+
+	currentBestGenotype = "";
+
 		currentPopulation = new String[MAX_POPULATION_SIZE];
 		for(int i = 0; i< currentPopulation.length; i++){
 			currentPopulation[i] = "012345670";
