@@ -1,4 +1,10 @@
+package routeSearch1;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
+
 
 /**
 TODO.
@@ -17,7 +23,7 @@ TODO.
 /**
 * Class for Route Search Genetic Algorithm.
 **/
-public class RouteSearch{
+public class RouteSearch extends Start{
 	
 	
 	
@@ -32,6 +38,9 @@ public class RouteSearch{
 	
 	private String[] currentPopulation;
 	private String currentBestGenotype;
+	private String[] holder;
+	private String[] cityOrder = new String[numberOfCities];
+	static Map<Integer, String> m = new HashMap<Integer, String>();
 		
 	public RouteSearch(int maxPopulationSize, double mutationChance, int keepTopNFittestSolutions, int[][] distancesMatrix){
 		MAX_POPULATION_SIZE = maxPopulationSize;
@@ -39,40 +48,50 @@ public class RouteSearch{
 		KEEP_TOP_N_FITTEST_SOLUTIONS = keepTopNFittestSolutions;
 		this.distancesMatrix = distancesMatrix;
 		random = new Random();
-		generateInitialPopulation();
+		cityList();
+		generateInitialPopulation(m);
+		 
+		
 	}
 	
 	/**TODO.
 		Randomize the initial population's genotypes
 		Need to ensure is valid, i.e. starts and ends at edinburgh, no repeats
 	**/
-	private void generateInitialPopulation(){
+	
+	/* This method is taking the Map created in the citList method at the bottom of class,
+	 * Using this map we can taken each entry at random and place the Strings into an array
+	 * of cities starting with and ending with Edinburgh.
+	 * We also initiate the Best GenoType so far to an empty string to ensure the best is taken
+	 * at step one. 
+	 * */
+	private void generateInitialPopulation(Map<Integer, String> m){
 
 	currentBestGenotype = "";
-		
-		int chromosome, i, thisCity, refLength;
-		currentPopulation = new String[MAX_POPULATION_SIZE];
-		
-		for(chromosome = 0; chromosome < numberOfCities; chromosome++ ){
-						
-			for( i = 0; i < numberOfCities; i++){
-			currentPopulation[i] = "012345670";
-			
-			}
-			
-			refLength = numberOfCities;
-			
-			for (i = 0; i < numberOfCities; i++){
-				thisCity = random.nextInt(refLength);
-				currentPopulation[i] = currentPopulation[thisCity];
-				currentPopulation[thisCity] = currentPopulation[refLength - 1];
-				refLength--;
-			}
-			
+	
+	Map<Integer, String> cm = m;
+	cityOrder[0] = "Edinburgh";
+	
+	for(int i = 1; i < numberOfCities; i++){
+		int r = random.nextInt(numberOfCities);
+		if(cm.get(r) != null){
+		cityOrder[i] = cm.get(r);
+		cm.remove(r);
+		i++;
 		}
-		
-		
-		System.out.println(""+ currentPopulation.length );
+	}
+	/*
+	 * Test output of Strings
+	 * */
+	
+	/*
+	 * for(int test = 0; test < numberOfCities; test++){
+	 * 		System.out.println("" + cityOrder[test]);
+	 * } 
+	 * 
+	 * */
+	
+	
 	}
 	
 	
@@ -222,5 +241,40 @@ public class RouteSearch{
 		}else{
 			return child;
 		}
+			
 	}
+	
+	/*Creates a HashMap which starts with edinburgh in Key 0 
+	maps a generic incremented int from 1-7 and stores the remaining cities from cities.txt
+	in the map for selection by int Key.
+	*/
+	
+private static Map<Integer,String> cityList(){
+		
+		
+		
+		try{
+			FileReader fr = new FileReader("cities.txt");
+			BufferedReader br = new BufferedReader(fr);
+			m.put(0, "Edinburgh");
+			for(int marker = 1; marker < 8; marker++ ){
+				String nextCity = br.readLine();
+				m.put(marker, nextCity);
+			}
+			br.close();
+			fr.close();
+		}catch(Exception e){
+			e.printStackTrace();
+			
+		}
+		
+		for(int c = 0; c < m.size(); c++){
+			String current = m.get(c);
+			System.out.println("" + current);
+		}
+		
+		return m;
+		
+	}
+	
 }
