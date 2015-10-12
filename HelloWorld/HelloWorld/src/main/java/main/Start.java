@@ -71,7 +71,31 @@ visits every city and takes the shortest distance.
 			STR  119 64    36    96    27    143   52    0   
 	**/
 	public static int[][] readDistancesMatrix(String location){
-		return new int[][] {{0}};
+		String[][] rawArrayData = new String[8][8];
+		try{
+			FileReader fileReader = new FileReader(location);
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			rawArrayData[0] = bufferedReader.readLine().split(",");
+			rawArrayData[1] = bufferedReader.readLine().split(",");
+			rawArrayData[2] = bufferedReader.readLine().split(",");
+			rawArrayData[3] = bufferedReader.readLine().split(",");
+			rawArrayData[4] = bufferedReader.readLine().split(",");
+			rawArrayData[5] = bufferedReader.readLine().split(",");
+			rawArrayData[6] = bufferedReader.readLine().split(",");
+			rawArrayData[7] = bufferedReader.readLine().split(",");
+			bufferedReader.close();
+			fileReader.close();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		int[][] integerArrayData = new int[8][8];
+		for(int i = 0; i < rawArrayData.length; i++){
+			for(int j = 0; j < rawArrayData[i].length; j++){
+				integerArrayData[i][j] = Integer.parseInt(rawArrayData[i][j]);
+			}
+		}
+		return integerArrayData;
 	}
 	
 	public static void testQASingleRun(){
