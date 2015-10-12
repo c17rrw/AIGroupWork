@@ -28,7 +28,6 @@ public class RouteSearch{
 	private int[][] distancesMatrix;
 	
 	private String[] currentPopulation;
-	private String[] newPopulation;
 	private String currentBestGenotype;
 		
 	public RouteSearch(int maxPopulationSize, double mutationChance, int keepTopNFittestSolutions, int[][] distancesMatrix){
@@ -58,7 +57,7 @@ public class RouteSearch{
 		int[] currentPopulationScores = calculateFitnessOfAll(currentPopulation);
 		String[] fittestSolutions = keepFittestSolutions(currentPopulation, currentPopulationScores);
 		String[] newSolutions = generateNewSolutions(fittestSolutions);
-		currentPopulation = concatenateArrays(fittestSolutions, newSolutions);
+		//currentPopulation = concatenateArrays(fittestSolutions, newSolutions);
 		return currentPopulation;
 	}
 	
@@ -67,7 +66,8 @@ public class RouteSearch{
 	}
 	
 	public int getCurrentBestGenotypeScore(){
-		return calculateFitnessOfOne(currentBestGenotype);
+		//return calculateFitnessOfOne(currentBestGenotype);
+		return 0;
 	}
 	
 	/**TODO.
@@ -86,12 +86,12 @@ public class RouteSearch{
 	}
 	
 	/**TODO**/
-	private int[] calculateFitnessOfAll(String[] newPopulation){
-		int[] newPopulationScores = new int[MAX_POPULATION_SIZE];
-		for(int i = 0; i < newPopulation.length; i++){
-			newPopulationScores[i] = calculateFitnessOfOne(newPopulation[i]);
+	private int[] calculateFitnessOfAll(String[] population){
+		int[] populationScores = new int[MAX_POPULATION_SIZE];
+		for(int i = 0; i < population.length; i++){
+			populationScores[i] = calculateFitnessOfOne(population[i]);
 		}
-		return newPopulationScores;
+		return populationScores;
 	}
 	
 	/**TODO.
@@ -99,9 +99,6 @@ public class RouteSearch{
 	**/
 	private int calculateFitnessOfOne(String solution){
 		String[] routeLocationStrings = solution.split("");
-		for(int i = 0; i <routeLocationStrings.length; i++){
-			System.out.println(""+i+": "+routeLocationStrings[i]);
-		}
 		int totalDistance = 0;
 		for(int i = 2; i < routeLocationStrings.length; i++){
 			int currentLocation = Integer.parseInt(routeLocationStrings[i]);
@@ -114,7 +111,7 @@ public class RouteSearch{
 	/**TODO.
 		Roulette wheel?
 	**/
-	private String[] keepFittestSolutions(String[] newPopulation, int[] newPopulationScores){
+	private String[] keepFittestSolutions(String[] population, int[] populationScores){
 		return new String[KEEP_TOP_N_FITTEST_SOLUTIONS];
 	}
 	
@@ -130,10 +127,16 @@ public class RouteSearch{
 		return "";
 	}
 	
-	/**TODO.
-		Random generator is wrong
-	**/
 	private String mutateChild(String child){
-		return random.nextDouble() % MUTATION_CHANCE == 0.0 ? child : "";
+		if(random.nextDouble() < MUTATION_CHANCE){
+			int swapPosition = random.nextInt(6)+2;
+			String mutatedChild = child.substring(0,swapPosition-1) +
+								  child.charAt(swapPosition) + 
+								  child.charAt(swapPosition-1) +
+								  child.substring(swapPosition+1);
+			return mutatedChild;
+		}else{
+			return child;
+		}
 	}
 }
