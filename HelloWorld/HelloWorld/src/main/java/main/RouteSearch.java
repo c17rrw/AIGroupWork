@@ -122,9 +122,48 @@ public class RouteSearch{
 	
 	/**TODO.
 		How to ensure a new child is valid?
+		Do crossover
+		Check that all places are visited
+		Remove any non-zero duplicates
+		For any missing, insert them at the position they were in one parent
 	**/
 	private String makeChild(String mother, String father){
-		return "";
+		String child = "";
+		for(int i = 0; i < mother.length; i++){
+			if(random.nextBoolean()){
+				child += mother.charAt(i);
+			}else{
+				child += father.charAt(i);
+			}
+		}
+		boolean visited = {false,false,false,false,false,false,false};
+		boolean duplicates = {false,false,false,false,false,false,false};
+		for(int i = 1; i < child.length-1; i++){
+			if(visited[child[i]]){
+				duplicates[child[i]] = true;
+			} else {
+				visited[child[i]]=true;
+			}
+		}
+		for(int i = 0; i < visited.length; i++){
+			if(duplicates[i]){
+				child = child.substring(0,child.indexOf(""+i)) +
+						child.substring(child.indexOf(""+i)+1);
+			}
+		}
+		for(int i = 0; i < visited.length; i++){
+			if(!visited[i]){
+				int positionInParent;
+				if(random.nextBoolean()){
+					positionInParent = mother.indexOf(""+i);
+				}else{
+					positionInParent = father.indexOf(""+i);
+				}
+				child = child.substring(0, positionInParent) +
+					i + child.substring(positionInParent+1);
+			}
+		}
+		return mutateChild(child);
 	}
 	
 	private String mutateChild(String child){
