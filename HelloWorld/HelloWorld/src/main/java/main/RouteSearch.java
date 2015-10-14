@@ -1,4 +1,4 @@
-package routeSearch1;
+//package routeSearch1;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.HashMap;
@@ -65,33 +65,34 @@ public class RouteSearch extends Start{
 	 * We also initiate the Best GenoType so far to an empty string to ensure the best is taken
 	 * at step one. 
 	 * */
-	private void generateInitialPopulation(Map<Integer, String> m){
+	private String[] generateInitialPopulation(Map<Integer, String> m){
 
 	currentBestGenotype = "";
 	
 	Map<Integer, String> cm = m;
 	cityOrder[0] = "Edinburgh";
+	 
 	
-	for(int i = 1; i < numberOfCities; i++){
+	for(int i = 1; numberOfCities == 0; i++){
 		int r = random.nextInt(numberOfCities);
-		if(cm.get(r) != null){
+		if(cm.get(r) == null){
+			System.out.println(r);
 		cityOrder[i] = cm.get(r);
-		cm.remove(r);
+		cm.remove(r);		
 		i++;
+		numberOfCities--;
+		}else{
+			System.out.println("An error has occured adding entry: " + i);
+			}
 		}
+	
+	/* Testing output
+	for(int z = 0; z < 8; z++){
+		System.out.println("" + cityOrder[z]);
+		
 	}
-	/*
-	 * Test output of Strings
-	 * */
-	
-	/*
-	 * for(int test = 0; test < numberOfCities; test++){
-	 * 		System.out.println("" + cityOrder[test]);
-	 * } 
-	 * 
-	 * */
-	
-	
+	*/
+	return currentPopulation = cityOrder;
 	}
 	
 	
@@ -270,7 +271,7 @@ private static Map<Integer,String> cityList(){
 		
 		for(int c = 0; c < m.size(); c++){
 			String current = m.get(c);
-			System.out.println("" + current);
+			//System.out.println("" + current);
 		}
 		
 		return m;
