@@ -38,9 +38,7 @@ public class RouteSearch extends Start{
 	
 	private String[] currentPopulation;
 	private String currentBestGenotype;
-	private String[] holder;
-	private String[] cityOrder = new String[numberOfCities];
-	static Map<Integer, String> m = new HashMap<Integer, String>();
+	private Map<Integer, String> m = new HashMap<Integer, String>();
 		
 	public RouteSearch(int maxPopulationSize, double mutationChance, int keepTopNFittestSolutions, int[][] distancesMatrix){
 		MAX_POPULATION_SIZE = maxPopulationSize;
@@ -50,8 +48,6 @@ public class RouteSearch extends Start{
 		random = new Random();
 		cityList();
 		generateInitialPopulation(m);
-		 
-		
 	}
 	
 	/**TODO.
@@ -65,34 +61,37 @@ public class RouteSearch extends Start{
 	 * We also initiate the Best GenoType so far to an empty string to ensure the best is taken
 	 * at step one. 
 	 * */
-	private String[] generateInitialPopulation(Map<Integer, String> m){
-
-	currentBestGenotype = "";
-	
-	Map<Integer, String> cm = m;
-	cityOrder[0] = "Edinburgh";
-	 
-	
-	for(int i = 1; numberOfCities == 0; i++){
-		int r = random.nextInt(numberOfCities);
-		if(cm.get(r) == null){
-			System.out.println(r);
-		cityOrder[i] = cm.get(r);
-		cm.remove(r);		
-		i++;
-		numberOfCities--;
-		}else{
-			System.out.println("An error has occured adding entry: " + i);
+	private void generateInitialPopulation(Map<Integer, String> m){
+		//String[] cityOrder = new String[numberOfCities+1];
+		String cityOrder = "";
+		currentPopulation = new String[MAX_POPULATION_SIZE];
+		currentBestGenotype = "";		
+		for(int j = 0; j < MAX_POPULATION_SIZE; j++){
+			//System.out.println(j);
+			int i = 1;
+			Map<Integer, String> cm = new HashMap<Integer, String>();
+			cm.putAll(m);
+			//cityOrder[0] = "Edinburgh";
+			cityOrder = "0";
+			while(!cm.isEmpty()){
+				int r = random.nextInt(numberOfCities);
+				if(cm.get(r) != null){
+					//System.out.println("r="+r+" - Loop "+j);
+					//cityOrder[i] = cm.get(r);
+					cityOrder += r;
+					//System.out.println(cityOrder[i]);
+					cm.remove(r);
+					i++;
+				}else{
+					//System.out.println("An error has occured adding entry: " + i);
+				}
 			}
+			//cityOrder[cityOrder.length-1] = "Edinburgh";
+			cityOrder += "0";
+			//for(String s : cityOrder){System.out.println(cityOrder);};
+System.out.println(cityOrder);
+			currentPopulation[j] = cityOrder;
 		}
-	
-	/* Testing output
-	for(int z = 0; z < 8; z++){
-		System.out.println("" + cityOrder[z]);
-		
-	}
-	*/
-	return currentPopulation = cityOrder;
 	}
 	
 	
@@ -250,15 +249,14 @@ public class RouteSearch extends Start{
 	in the map for selection by int Key.
 	*/
 	
-private static Map<Integer,String> cityList(){
+private Map<Integer,String> cityList(){
 		
 		
 		
 		try{
 			FileReader fr = new FileReader("cities.txt");
 			BufferedReader br = new BufferedReader(fr);
-			m.put(0, "Edinburgh");
-			for(int marker = 1; marker < 8; marker++ ){
+			for(int marker = 0; marker < 7; marker++ ){
 				String nextCity = br.readLine();
 				m.put(marker, nextCity);
 			}
