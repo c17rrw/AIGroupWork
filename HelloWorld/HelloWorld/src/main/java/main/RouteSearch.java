@@ -46,7 +46,7 @@ public class RouteSearch extends Start{
 		KEEP_TOP_N_FITTEST_SOLUTIONS = (int) (maxPopulationSize * keepTopNFittestSolutions);
 		this.distancesMatrix = distancesMatrix;
 		random = new Random();
-		cityList();
+		createCityMap();
 		generateInitialPopulation(m);
 	}
 	
@@ -101,8 +101,8 @@ System.out.println(cityOrder);
 	public String[] iterateOneStep(){
 		int[] currentPopulationScores = calculateFitnessOfAll(currentPopulation);
 		String[] fittestSolutions = keepFittestSolutions(currentPopulation, currentPopulationScores);
-		String[] newSolutions = generateNewSolutions(fittestSolutions);
-		//currentPopulation = concatenateArrays(fittestSolutions, newSolutions);
+		String[] newSolutions = generateChildren(fittestSolutions);
+		currentPopulation = concatenateArrays(fittestSolutions, newSolutions);
 		return currentPopulation;
 	}
 	
@@ -111,13 +111,9 @@ System.out.println(cityOrder);
 	}
 	
 	public int getCurrentBestGenotypeScore(){
-		//return calculateFitnessOfOne(currentBestGenotype);
-		return 0;
+		return calculateFitnessOfOne(currentBestGenotype);
 	}
 	
-	/**TODO.
-		Untested
-	**/
 	private String[] concatenateArrays(String[] a1, String[] a2){
 		String[] fullArray = new String[a1.length+a2.length];
 		int fullArrayPos = 0;
@@ -130,7 +126,6 @@ System.out.println(cityOrder);
 		return fullArray;
 	}
 	
-	/**TODO**/
 	private int[] calculateFitnessOfAll(String[] population){
 		int[] populationScores = new int[MAX_POPULATION_SIZE];
 		for(int i = 0; i < population.length; i++){
@@ -140,29 +135,44 @@ System.out.println(cityOrder);
 	}
 	
 	/**TODO.
-		Needs testing.
+		This will be broken with the current implementation of how routes are numbered.
 	**/
 	private int calculateFitnessOfOne(String solution){
 		String[] routeLocationStrings = solution.split("");
 		int totalDistance = 0;
+		//Start at 2 because .split("") produces empty string at position 0
 		for(int i = 2; i < routeLocationStrings.length; i++){
 			int currentLocation = Integer.parseInt(routeLocationStrings[i]);
 			int previousLocation = Integer.parseInt(routeLocationStrings[i-1]);
-			totalDistance += distancesMatrix[currentLocation][previousLocation];
+			totalDistance += distancesMatrix[currentLocation][previousLocation]; // this bit is broken
 		}
-		return totalDistance;
+		return (totalDistance==0) ? 0 : (int) (1 / totalDistance) * 100000;
 	}
 	
 	/**TODO.
 		Roulette wheel?
 	**/
 	private String[] keepFittestSolutions(String[] population, int[] populationScores){
-		return new String[KEEP_TOP_N_FITTEST_SOLUTIONS];
+		//higher score = better choice = more chance of being picked
+		//sum all scores
+		//assign chance to each of population = score of one / population
+		//make a roulette wheel
+		//array
+		//TEMP SOLUTION TO PREVENT CRASHES ONLY:
+		String[] fittest = new String[KEEP_TOP_N_FITTEST_SOLUTIONS];
+		for(int i = 0 ; i< KEEP_TOP_N_FITTEST_SOLUTIONS; i++){
+			fittest[i] = population[i];
+		}
+		return fittest;
 	}
 	
-	/**TODO**/
-	private String[] generateNewSolutions(String[] parentStock){
-		return new String[MAX_POPULATION_SIZE-KEEP_TOP_N_FITTEST_SOLUTIONS];
+	private String[] generateChildren(String[] parentStock){
+		String[] children = new String[MAX_POPULATION_SIZE-KEEP_TOP_N_FITTEST_SOLUTIONS];
+		for(int i = 0; i < children.length; i++){
+			int parentPairPosition = random.nextInt(parentStock.length-1);
+			children[i] = makeChild(parentStock[parentPairPosition], parentStock[parentPairPosition+1]);
+		}
+		return children;
 	}
 	
 	private String makeChild(String mother, String father){
@@ -249,14 +259,11 @@ System.out.println(cityOrder);
 	in the map for selection by int Key.
 	*/
 	
-private Map<Integer,String> cityList(){
-		
-		
-		
+	private Map<Integer,String> createCityMap(){
 		try{
 			FileReader fr = new FileReader("cities.txt");
 			BufferedReader br = new BufferedReader(fr);
-			for(int marker = 0; marker < 7; marker++ ){
+			for(int marker = 1; marker < 8; marker++ ){
 				String nextCity = br.readLine();
 				m.put(marker, nextCity);
 			}
@@ -267,10 +274,10 @@ private Map<Integer,String> cityList(){
 			
 		}
 		
-		for(int c = 0; c < m.size(); c++){
-			String current = m.get(c);
-			//System.out.println("" + current);
-		}
+		//for(int c = 0; c < m.size(); c++){
+		//	String current = m.get(c);
+		//	System.out.println("" + current + c);
+		//}
 		
 		return m;
 		
