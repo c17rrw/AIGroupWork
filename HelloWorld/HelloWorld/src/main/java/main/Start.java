@@ -10,50 +10,30 @@ bike tour.  We will base the best result as one that
 visits every city and takes the shortest distance.  
 
 **************************************************/
+	private static final String DISTANCES_MATRIX_LOCATION = "route.alt.txt";
 	private static final int REPEAT_THIS_GA_FOR_STATISTICS = 50;
-	
 	private static final int[] MAXIMUM_POPULATION_COUNTS = {10, 50, 100, 500, 1000, 5000, 10000};
 	private static final double[] MUTATION_CHANCES = {0.001, 0.005, 0.01, 0.05, 0.1, 0.25};
-	private static final int[] FITNESS_KEEPING_AMOUNT = {20, 40, 60};
+	private static final double[] FITNESS_KEEPING_AMOUNT = {0.2, 0.4, 0.6};
 	private static final int[] ITERATION_AMOUNTS = {10, 50, 100, 500, 1000};
 	
 	private static int[][] distancesMatrix;
-	
-	/** Repetitions.
-		We need to repeat across may iterations with different
-			int max population size
-			double mutation chance
-			int how many of the fittest solutions to keep each time, as percentage of pop
-		MaxPop: 10, 50, 100, 500, 1000, 5000, 10000
-		MutCh: 0.001, 0.005, 0.01, 0.05, 0.1, 0.25
-		Fitkeep: 20% of maxpop, 40% of maxpop, 60% of maxpop		
-		For each of max populations
-			For each of mutation chance
-				For each of keep fitness
-					For each number of iterations
-						For statistics repeat count
-							Start GA
-							Start Timer
-							For each iteration
-								Iterate GA
-							Stop Timer
-							Keep a record of the best solution from population and its score
-		There are 31500 GAs created, with 10,458,000 total iterations
-		Should be enough for statistical analysis, right?
-		However, even if each run takes 1 second, the whole suite will take 2905 hours to run.
-	**/
 
-	/**TODO.
-	**		What to print after each iteration is completed
-	**		Find a way to pass in the distances matrix
-	**			[probably only used in fitness calculation]
-	**/
+	private static int defaultPopulationCount;
+	private static double defaultMutationChance;
+	private static double defaultFitnessKeepingAmount;
+	private static int defaultIterationAmount;
+	
 	public static void main(String[] s) {
-		//distancesMatrix = readDistancesMatrix("route.txt");
-		distancesMatrix = readDistancesMatrix("route.alt.txt");
-		//runEntireTestSuite();
-		testQASingleRun();
-		}
+		defaultPopulationCount = MAXIMUM_POPULATION_COUNTS[1];
+		defaultMutationChance = MUTATION_CHANCES[1];
+		defaultFitnessKeepingAmount = FITNESS_KEEPING_AMOUNT[1];
+		defaultIterationAmount = ITERATION_AMOUNTS[1];
+		distancesMatrix = readDistancesMatrixFromFile(DISTANCES_MATRIX_LOCATION);
+		printCSVHeader();
+		//runEntireGASuiteForStatistics();
+		runTheGAWithParams(defaultPopulationCount, defaultMutationChance, defaultFitnessKeepingAmount, defaultIterationAmount);
+	}
 	
 	/**TODO.
 		Read the distance matrix in and convert it into a 2-d array
@@ -70,7 +50,7 @@ visits every city and takes the shortest distance.
 			STA  79  118   50    134   81    145   0     143
 			STR  119 64    36    96    27    143   52    0   
 	**/
-	public static int[][] readDistancesMatrix(String location){
+	private static int[][] readDistancesMatrixFromFile(String location){
 		String[][] rawArrayData = new String[8][8];
 		try{
 			FileReader fileReader = new FileReader(location);
@@ -99,44 +79,56 @@ visits every city and takes the shortest distance.
 		return integerArrayData;
 	}
 	
-	public static void testQASingleRun(){
-		int maxPopulationSize = 10;
-		double mutationChance = 0.001;
-		int amountOfFittestPopulationToKeep = 4;
-		int iterationCount = 50;
-		runTheGAWithParams(maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep, iterationCount);
+	private static void runEntireGASuiteForStatistics(){
+		for(int maxPopulationSize : MAXIMUM_POPULATION_COUNTS){
+			repeatTheGAForStatisticsWithTheseParams(maxPopulationSize, defaultMutationChance, defaultFitnessKeepingAmount, defaultIterationAmount);
+		}
+		for(double mutationChance : MUTATION_CHANCES){
+			repeatTheGAForStatisticsWithTheseParams(defaultPopulationCount, mutationChance, defaultFitnessKeepingAmount, defaultIterationAmount);
+		}
+		for(double fitnessKeepPercent : FITNESS_KEEPING_AMOUNT){
+			repeatTheGAForStatisticsWithTheseParams(defaultPopulationCount, defaultMutationChance, fitnessKeepPercent, defaultIterationAmount);
+		}
+		for(int iterationCount : ITERATION_AMOUNTS){
+			repeatTheGAForStatisticsWithTheseParams(defaultPopulationCount, defaultMutationChance, defaultFitnessKeepingAmount, iterationCount);
+		}
 	}
 	
-	public static void runEntireTestSuite(){
-		long suiteStart = System.currentTimeMillis();
-		for(int maxPopulationSize : MAXIMUM_POPULATION_COUNTS){
-			for(double mutationChance : MUTATION_CHANCES){
-				for(int fitnessKeepPercent : FITNESS_KEEPING_AMOUNT){
-					int amountOfFittestPopulationToKeep = maxPopulationSize * fitnessKeepPercent / 100;
-					for(int iterationCount : ITERATION_AMOUNTS){
-						for(int j = 0; j < REPEAT_THIS_GA_FOR_STATISTICS; j++){
-							runTheGAWithParams(maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep, iterationCount);
-						}						
-					}
-				}
-			}
-		}
-		System.out.println("Total Time Elapsed: " + (System.currentTimeMillis()-suiteStart) + "ms");
+	private static void repeatTheGAForStatisticsWithTheseParams(int maxPopulationSize, double mutationChance, double amountOfFittestPopulationToKeep, int iterationCount){
+		for(int j = 0; j < REPEAT_THIS_GA_FOR_STATISTICS; j++){
+			runTheGAWithParams(maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep, iterationCount);
+		}	
 	}
 
-	public static void runTheGAWithParams(int maxPopulationSize, double mutationChance, int amountOfFittestPopulationToKeep, int iterationCount){
+	private static void runTheGAWithParams(int maxPopulationSize, double mutationChance, double amountOfFittestPopulationToKeep, int iterationCount){
+		long gaStart = System.currentTimeMillis();
 		RouteSearch routeSearch = new RouteSearch(maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep, distancesMatrix);
-		long startTime = System.currentTimeMillis();
 		for(int k = 0; k < iterationCount; k++){
 			routeSearch.iterateOneStep();
 		}
-		long totalTime = System.currentTimeMillis() - startTime;
+		printResultForCSV( maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep, 
+				iterationCount, routeSearch.getCurrentBestGenotype(), 
+				routeSearch.getCurrentBestGenotypeScore(), (System.currentTimeMillis()-gaStart));
+	}
+	
+	private static void printCSVHeader(){
 		System.out.println(
-		"P: "+maxPopulationSize+
-		"\tM: "+mutationChance+"\tI:"+iterationCount +
-		"\tR: "+amountOfFittestPopulationToKeep+
-		"\tB: "+routeSearch.getCurrentBestGenotype()+
-		"("+routeSearch.getCurrentBestGenotypeScore()+")"+
-		"\tT:" + totalTime);
+				"maxPopulationSize,"+
+				"mutationChance,"+
+				"iterationCount,"+
+				"amountOfFittestPopulationToKeep"+
+				"bestGenotype,"+
+				"bestGenotypeScore,"+
+				"totalTime");
+	}
+	private static void printResultForCSV(int maxPopulationSize, double mutationChance, double amountOfFittestPopulationToKeep, int iterationCount, String bestGenotype, int bestGenotypeScore, long totalTime){
+		System.out.println(
+				""+maxPopulationSize+
+				","+mutationChance+
+				","+iterationCount+
+				","+amountOfFittestPopulationToKeep+
+				","+bestGenotype+
+				","+bestGenotypeScore+
+				"," + totalTime);
 	}
 }

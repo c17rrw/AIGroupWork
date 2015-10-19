@@ -40,10 +40,10 @@ public class RouteSearch extends Start{
 	private String currentBestGenotype;
 	private Map<Integer, String> m = new HashMap<Integer, String>();
 		
-	public RouteSearch(int maxPopulationSize, double mutationChance, int keepTopNFittestSolutions, int[][] distancesMatrix){
+	public RouteSearch(int maxPopulationSize, double mutationChance, double keepTopNFittestSolutions, int[][] distancesMatrix){
 		MAX_POPULATION_SIZE = maxPopulationSize;
 		MUTATION_CHANCE = mutationChance;
-		KEEP_TOP_N_FITTEST_SOLUTIONS = keepTopNFittestSolutions;
+		KEEP_TOP_N_FITTEST_SOLUTIONS = (int) (maxPopulationSize * keepTopNFittestSolutions);
 		this.distancesMatrix = distancesMatrix;
 		random = new Random();
 		cityList();
