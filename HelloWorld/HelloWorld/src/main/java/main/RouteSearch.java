@@ -4,22 +4,11 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-
-
-/**
-TODO.
-	How to encode solutions [Genotype]
-		0-Aberdeen
-		1-ayr
-		2-Edinburgh
-		3-fortwilliam
-		4-Glasgow
-		5-inverness
-		6-standrews
-		7-stirling
-	How to splice parent genes
-**/
-
+/**TODO.
+-Best iteration number
+-Print all iterations
+-Roulette wheel thing
+*/
 /**
 * Class for Route Search Genetic Algorithm.
 **/
@@ -35,7 +24,10 @@ public class RouteSearch{
 	public int numberOfCities = 8;
 	
 	private String[] currentPopulation;
+	
 	private String currentBestGenotype;
+	private int currentBestGenotypeScore;
+	
 	private Map<Integer, String> m = new HashMap<Integer, String>();
 		
 	public RouteSearch(int maxPopulationSize, double mutationChance, double keepTopNFittestSolutions, int[][] distancesMatrix){
@@ -46,6 +38,8 @@ public class RouteSearch{
 		random = new Random();
 		createCityMap();
 		generateInitialPopulation(m);
+		currentBestGenotype = "";
+		currentBestGenotypeScore = -1;
 	}
 	
 	/* This method is taking the Map created in the citList method at the bottom of class,
@@ -72,15 +66,10 @@ public class RouteSearch{
 				}
 			}
 			cityOrder += "2";
-			//System.out.println(cityOrder);
 			currentPopulation[j] = cityOrder;
 		}
 	}
 	
-	/*Creates a HashMap which starts with edinburgh in Key 0 
-	maps a generic incremented int from 1-7 and stores the remaining cities from cities.txt
-	in the map for selection by int Key.
-	*/
 	private Map<Integer,String> createCityMap(){
 		try{
 			FileReader fr = new FileReader("cities.txt");
@@ -94,7 +83,6 @@ public class RouteSearch{
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		//for(int c = 0; c < m.size(); c++){System.out.println("" + m.get(c) + c);}
 		return m;
 	}
 	
@@ -103,23 +91,18 @@ public class RouteSearch{
 		String[] fittestSolutions = keepFittestSolutions(currentPopulation, currentPopulationScores);
 		String[] newSolutions = generateChildren(fittestSolutions);
 		currentPopulation = concatenateArrays(fittestSolutions, newSolutions);
-		//System.out.println("Population for this iteration");
-		//for(String s : currentPopulation){System.out.println(s);}
 		detectCurrentBestGenotype();
 		return currentPopulation;
 	}
 	
 	private void detectCurrentBestGenotype(){
-		int maxScore = -1; //does this overwrite the best each iteration
-		String bestSoFar = ""; //not sure this is needed
 		for(String s : currentPopulation){
 			int currentScore = calculateFitnessOfOne(s);
-			if(currentScore>maxScore){
-				maxScore = currentScore;
-				bestSoFar = s;
+			if(currentScore>currentBestGenotypeScore){
+				currentBestGenotypeScore = currentScore;
+				currentBestGenotype = s;
 			}
 		}
-		currentBestGenotype = bestSoFar;
 	}
 	
 	public String getCurrentBestGenotype(){
@@ -150,18 +133,14 @@ public class RouteSearch{
 		return populationScores;
 	}
 	
-	/**TODO.
-		This will be broken with the current implementation of how routes are numbered.
-	**/
 	private int calculateFitnessOfOne(String solution){
 		String[] routeLocationStrings = solution.split("");
 		int totalDistance = 0;
 		//Start at 2 because .split("") produces empty string at position 0
-		for(int i = 2; i < routeLocationStrings.length; i++){
+		for(int i = 1; i < routeLocationStrings.length; i++){
 			int currentLocation = Integer.parseInt(routeLocationStrings[i]);
 			int previousLocation = Integer.parseInt(routeLocationStrings[i-1]);
-			totalDistance += distancesMatrix[currentLocation][previousLocation];
-			//System.out.println(solution+" D<"+totalDistance+"> S<"+(int) ((1.0 / totalDistance) * 100000)+">");
+			totalDistance += distancesMatrix[previousLocation][currentLocation];
 		}
 		return (totalDistance==0) ? 1000001 : (int) ((1.0 / totalDistance) * 100000);
 	}
@@ -210,16 +189,8 @@ public class RouteSearch{
 				visitedLocations[currentLocation] = true;
 			}
 		}
-		
-		//System.out.print("Autogen Child: "+child+" | visited: ");
-		//for(boolean b : visitedLocations){System.out.print((b) ? 1 : 0);}
-		//System.out.print(" | dupes: ");
-		//for(boolean b : visitedTwiceLocations){System.out.print((b) ? 1 : 0);}
 		child = removeDuplicatesFromChild(child, visitedTwiceLocations);
-		//System.out.println("\nRemdupe Child: "+child);
-		child = insertMissingIntoChild(child, mother, father, visitedLocations);
-		//System.out.println("FINAL   CHILD: "+child);
-		
+		child = insertMissingIntoChild(child, mother, father, visitedLocations);		
 		return mutateChild(child);
 	}
 	

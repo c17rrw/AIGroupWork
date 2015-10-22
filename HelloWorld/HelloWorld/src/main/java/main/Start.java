@@ -31,8 +31,8 @@ visits every city and takes the shortest distance.
 		defaultIterationAmount = ITERATION_AMOUNTS[1];
 		distancesMatrix = readDistancesMatrixFromFile(DISTANCES_MATRIX_LOCATION);
 		printCSVHeader();
-		runEntireGASuiteForStatistics();
-		//runTheGAWithParams(defaultPopulationCount, defaultMutationChance, defaultFitnessKeepingAmount, defaultIterationAmount);
+		//runEntireGASuiteForStatistics();
+		runTheGAWithParams(defaultPopulationCount, defaultMutationChance, defaultFitnessKeepingAmount, defaultIterationAmount);
 	}
 	
 	/**TODO.
