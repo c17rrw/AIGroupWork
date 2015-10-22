@@ -31,8 +31,8 @@ visits every city and takes the shortest distance.
 		defaultIterationAmount = ITERATION_AMOUNTS[1];
 		distancesMatrix = readDistancesMatrixFromFile(DISTANCES_MATRIX_LOCATION);
 		printCSVHeader();
-		//runEntireGASuiteForStatistics();
-		runTheGAWithParams(defaultPopulationCount, defaultMutationChance, defaultFitnessKeepingAmount, defaultIterationAmount);
+		runEntireGASuiteForStatistics();
+		//runTheGAWithParams(defaultPopulationCount, defaultMutationChance, defaultFitnessKeepingAmount, defaultIterationAmount);
 	}
 	
 	/**TODO.
@@ -48,7 +48,17 @@ visits every city and takes the shortest distance.
 			GLS  146 33    43    116   0     175   81    27
 			INV  105 207   154   64*   175   0     145   143
 			STA  79  118   50    134   81    145   0     143
-			STR  119 64    36    96    27    143   52    0   
+			STR  119 64    36    96    27    143   52    0  
+			
+		         0   1     2     3     4     5     6     7
+			0    0   179   129   157   146   105   79    119
+			1    179 0     79    141   33    207   118   64
+			2    129 79    0     131   43    154   50    36      
+			3    157 141   131   0     116   74*   134   98
+			4    146 33    43    116   0     175   81    27
+			5    105 207   154   64*   175   0     145   143
+			6    79  118   50    134   81    145   0     143
+			7    119 64    36    96    27    143   52    0 
 	**/
 	private static int[][] readDistancesMatrixFromFile(String location){
 		String[][] rawArrayData = new String[8][8];
@@ -116,7 +126,7 @@ visits every city and takes the shortest distance.
 				"maxPopulationSize,"+
 				"mutationChance,"+
 				"iterationCount,"+
-				"amountOfFittestPopulationToKeep"+
+				"amountOfFittestPopulationToKeep,"+
 				"bestGenotype,"+
 				"bestGenotypeScore,"+
 				"totalTime");

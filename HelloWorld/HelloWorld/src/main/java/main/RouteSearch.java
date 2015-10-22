@@ -23,10 +23,8 @@ TODO.
 /**
 * Class for Route Search Genetic Algorithm.
 **/
-public class RouteSearch extends Start{
-	
-	
-	
+public class RouteSearch{
+	 
 	private int MAX_POPULATION_SIZE;
 	private int KEEP_TOP_N_FITTEST_SOLUTIONS;
 	private double MUTATION_CHANCE;
@@ -50,11 +48,6 @@ public class RouteSearch extends Start{
 		generateInitialPopulation(m);
 	}
 	
-	/**TODO.
-		Randomize the initial population's genotypes
-		Need to ensure is valid, i.e. starts and ends at edinburgh, no repeats
-	**/
-	
 	/* This method is taking the Map created in the citList method at the bottom of class,
 	 * Using this map we can taken each entry at random and place the Strings into an array
 	 * of cities starting with and ending with Edinburgh.
@@ -62,48 +55,71 @@ public class RouteSearch extends Start{
 	 * at step one. 
 	 * */
 	private void generateInitialPopulation(Map<Integer, String> m){
-		//String[] cityOrder = new String[numberOfCities+1];
-		String cityOrder = "";
+		String cityOrder;
 		currentPopulation = new String[MAX_POPULATION_SIZE];
 		currentBestGenotype = "";		
 		for(int j = 0; j < MAX_POPULATION_SIZE; j++){
-			//System.out.println(j);
 			int i = 1;
-			Map<Integer, String> cm = new HashMap<Integer, String>();
+			Map<Integer, String> cm = new HashMap<>();
 			cm.putAll(m);
-			//cityOrder[0] = "Edinburgh";
-			cityOrder = "0";
+			cityOrder = "2";
 			while(!cm.isEmpty()){
 				int r = random.nextInt(numberOfCities);
 				if(cm.get(r) != null){
-					//System.out.println("r="+r+" - Loop "+j);
-					//cityOrder[i] = cm.get(r);
-					cityOrder += r;
-					//System.out.println(cityOrder[i]);
+					cityOrder += (r!=2) ? r : "";
 					cm.remove(r);
 					i++;
-				}else{
-					//System.out.println("An error has occured adding entry: " + i);
 				}
 			}
-			//cityOrder[cityOrder.length-1] = "Edinburgh";
-			cityOrder += "0";
-			//for(String s : cityOrder){System.out.println(cityOrder);};
-System.out.println(cityOrder);
+			cityOrder += "2";
+			//System.out.println(cityOrder);
 			currentPopulation[j] = cityOrder;
 		}
 	}
 	
+	/*Creates a HashMap which starts with edinburgh in Key 0 
+	maps a generic incremented int from 1-7 and stores the remaining cities from cities.txt
+	in the map for selection by int Key.
+	*/
+	private Map<Integer,String> createCityMap(){
+		try{
+			FileReader fr = new FileReader("cities.txt");
+			BufferedReader br = new BufferedReader(fr);
+			for(int marker = 0; marker < 8; marker++ ){
+				String nextCity = br.readLine();
+				m.put(marker, nextCity);
+			}
+			br.close();
+			fr.close();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		//for(int c = 0; c < m.size(); c++){System.out.println("" + m.get(c) + c);}
+		return m;
+	}
 	
-	/**TODO.
-		Untested
-	**/
 	public String[] iterateOneStep(){
 		int[] currentPopulationScores = calculateFitnessOfAll(currentPopulation);
 		String[] fittestSolutions = keepFittestSolutions(currentPopulation, currentPopulationScores);
 		String[] newSolutions = generateChildren(fittestSolutions);
 		currentPopulation = concatenateArrays(fittestSolutions, newSolutions);
+		//System.out.println("Population for this iteration");
+		//for(String s : currentPopulation){System.out.println(s);}
+		detectCurrentBestGenotype();
 		return currentPopulation;
+	}
+	
+	private void detectCurrentBestGenotype(){
+		int maxScore = -1; //does this overwrite the best each iteration
+		String bestSoFar = ""; //not sure this is needed
+		for(String s : currentPopulation){
+			int currentScore = calculateFitnessOfOne(s);
+			if(currentScore>maxScore){
+				maxScore = currentScore;
+				bestSoFar = s;
+			}
+		}
+		currentBestGenotype = bestSoFar;
 	}
 	
 	public String getCurrentBestGenotype(){
@@ -144,9 +160,10 @@ System.out.println(cityOrder);
 		for(int i = 2; i < routeLocationStrings.length; i++){
 			int currentLocation = Integer.parseInt(routeLocationStrings[i]);
 			int previousLocation = Integer.parseInt(routeLocationStrings[i-1]);
-			totalDistance += distancesMatrix[currentLocation][previousLocation]; // this bit is broken
+			totalDistance += distancesMatrix[currentLocation][previousLocation];
+			//System.out.println(solution+" D<"+totalDistance+"> S<"+(int) ((1.0 / totalDistance) * 100000)+">");
 		}
-		return (totalDistance==0) ? 0 : (int) (1 / totalDistance) * 100000;
+		return (totalDistance==0) ? 1000001 : (int) ((1.0 / totalDistance) * 100000);
 	}
 	
 	/**TODO.
@@ -176,7 +193,7 @@ System.out.println(cityOrder);
 	}
 	
 	private String makeChild(String mother, String father){
-		String child = "";
+		String child;
 		
 		int crossoverPoint = random.nextInt(mother.length());
 		child = mother.substring(0, crossoverPoint) +
@@ -194,14 +211,20 @@ System.out.println(cityOrder);
 			}
 		}
 		
+		//System.out.print("Autogen Child: "+child+" | visited: ");
+		//for(boolean b : visitedLocations){System.out.print((b) ? 1 : 0);}
+		//System.out.print(" | dupes: ");
+		//for(boolean b : visitedTwiceLocations){System.out.print((b) ? 1 : 0);}
 		child = removeDuplicatesFromChild(child, visitedTwiceLocations);
+		//System.out.println("\nRemdupe Child: "+child);
 		child = insertMissingIntoChild(child, mother, father, visitedLocations);
+		//System.out.println("FINAL   CHILD: "+child);
 		
 		return mutateChild(child);
 	}
 	
 	private String removeDuplicatesFromChild(String child, boolean[] duplicates){
-		for(int i = 1; i < duplicates.length; i++){
+		for(int i = 0; i < duplicates.length; i++){
 			if(duplicates[i]){
 				int positionOfDuplicate;
 				if(random.nextBoolean()){
@@ -217,8 +240,8 @@ System.out.println(cityOrder);
 	}
 	
 	private String insertMissingIntoChild(String child, String mother, String father, boolean[] visitedLocations){
-		for(int i = 1; i < visitedLocations.length; i++){
-			if(!visitedLocations[i]){
+		for(int i = 0; i < visitedLocations.length; i++){
+			if(!visitedLocations[i] && i!=2){
 				String chosenParent;
 				if(random.nextBoolean()){
 					chosenParent = mother;
@@ -229,9 +252,9 @@ System.out.println(cityOrder);
 				String numberNextToCurrentInParent = String.valueOf(chosenParent.charAt(positionOfNumberNextToCurrentInParent));
 				int positionToPlaceAt = child.indexOf(numberNextToCurrentInParent);
 				if(positionToPlaceAt < 0){
-					child = child.substring(0, child.length()-1) + i + "0";
+					child = child.substring(0, child.length()-1) + i + "2";
 				} else if(positionToPlaceAt==0){
-					child = "0" + i + child.substring(1);
+					child = "2" + i + child.substring(1);
 				} else {
 					child = child.substring(0, positionToPlaceAt) + i + child.substring(positionToPlaceAt);
 				}
@@ -252,35 +275,6 @@ System.out.println(cityOrder);
 			return child;
 		}
 			
-	}
-	
-	/*Creates a HashMap which starts with edinburgh in Key 0 
-	maps a generic incremented int from 1-7 and stores the remaining cities from cities.txt
-	in the map for selection by int Key.
-	*/
-	
-	private Map<Integer,String> createCityMap(){
-		try{
-			FileReader fr = new FileReader("cities.txt");
-			BufferedReader br = new BufferedReader(fr);
-			for(int marker = 1; marker < 8; marker++ ){
-				String nextCity = br.readLine();
-				m.put(marker, nextCity);
-			}
-			br.close();
-			fr.close();
-		}catch(Exception e){
-			e.printStackTrace();
-			
-		}
-		
-		//for(int c = 0; c < m.size(); c++){
-		//	String current = m.get(c);
-		//	System.out.println("" + current + c);
-		//}
-		
-		return m;
-		
 	}
 	
 }
