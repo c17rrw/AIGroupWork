@@ -92,7 +92,10 @@ public class RouteSearch{
 		String[] newSolutions = generateChildren(fittestSolutions);
 		currentPopulation = concatenateArrays(fittestSolutions, newSolutions);
 		detectCurrentBestGenotype();
+<<<<<<< HEAD
 		for(String s : fittestSolutions){System.out.println(s);}
+=======
+>>>>>>> origin/master
 		return currentPopulation;
 	}
 	
