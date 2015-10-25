@@ -18,6 +18,8 @@ visits every city and takes the shortest distance.
 	private static final int[] ITERATION_AMOUNTS = {10, 50, 100, 500, 1000};
 	
 	private static int[][] distancesMatrix;
+	
+	private static int iterationNumber = 0;
 
 	private static int defaultPopulationCount;
 	private static double defaultMutationChance;
@@ -30,12 +32,8 @@ visits every city and takes the shortest distance.
 		defaultFitnessKeepingAmount = FITNESS_KEEPING_AMOUNT[1];
 		defaultIterationAmount = ITERATION_AMOUNTS[1];
 		distancesMatrix = readDistancesMatrixFromFile(DISTANCES_MATRIX_LOCATION);
-<<<<<<< HEAD
-		//printCSVHeader();
-=======
 		printCSVHeader();
->>>>>>> origin/master
-		//runEntireGASuiteForStatistics();
+		runEntireGASuiteForStatistics();
 		runTheGAWithParams(defaultPopulationCount, defaultMutationChance, defaultFitnessKeepingAmount, defaultIterationAmount);
 	}
 	
@@ -119,6 +117,7 @@ visits every city and takes the shortest distance.
 		RouteSearch routeSearch = new RouteSearch(maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep, distancesMatrix);
 		for(int k = 0; k < iterationCount; k++){
 			routeSearch.iterateOneStep();
+			iterationNumber++;
 		}
 		printResultForCSV( maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep, 
 				iterationCount, routeSearch.getCurrentBestGenotype(), 
@@ -145,4 +144,10 @@ visits every city and takes the shortest distance.
 				","+bestGenotypeScore+
 				"," + totalTime);
 	}
+	
+	public static int getIterationNumber(){
+		return iterationNumber;
+	}
+	
+	
 }

@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 /**TODO.
--Best iteration number
--Print all iterations
--Roulette wheel thing
+-Best iteration number *Done
+-Print all iterations * Done
+-Roulette wheel thing * Done
 */
 /**
 * Class for Route Search Genetic Algorithm.
@@ -22,6 +22,7 @@ public class RouteSearch{
 	
 	private int[][] distancesMatrix;
 	public int numberOfCities = 8;
+	public int iterationNumber = 0;
 	
 	private String[] currentPopulation;
 	
@@ -92,10 +93,7 @@ public class RouteSearch{
 		String[] newSolutions = generateChildren(fittestSolutions);
 		currentPopulation = concatenateArrays(fittestSolutions, newSolutions);
 		detectCurrentBestGenotype();
-<<<<<<< HEAD
-		for(String s : fittestSolutions){System.out.println(s);}
-=======
->>>>>>> origin/master
+		//for(String s : fittestSolutions){System.out.println(s);}
 		return currentPopulation;
 	}
 	
@@ -149,11 +147,35 @@ public class RouteSearch{
 		return (totalDistance==0) ? 1000001 : (int) ((1.0 / totalDistance) * 100000);
 	}
 	
+	private void printAllIterations(String[] currentPopulation){
+		
+		String[] copy = new String[currentPopulation.length];
+		
+		System.arraycopy(currentPopulation, 0, copy, 0, copy.length);
+
+		for(int count = 0; count < MAX_POPULATION_SIZE; count++){
+		
+			for (int count2 = 0; count2 < copy.length; count2++){
+				System.out.print("-> " + copy[count2]);
+			}
+		}
+	}
+	
+	private static int bestIterationNumber(int iterationNumber){	
+			
+			iterationNumber = Start.getIterationNumber();
+			
+			int bestIteration = iterationNumber;
+				
+		return bestIteration;
+	}
+	
+	
 	/**TODO.
 		Roulette wheel?
 	**/
 	
-	private static int rouletteWheelSelect(){
+	private  int rouletteWheelSelect(int[] currentPopulationScores){
 		
 		
 		
@@ -161,7 +183,7 @@ public class RouteSearch{
 		double pointer, accumulatingFitness, randReal;
 		int chromosone, randInt, selected = 0;
 		int test = 0;
-		int[] holder = new int[MAX_POPULATION_SIZE];
+		//int[] holder = new int[MAX_POPULATION_SIZE];
 		
 		fitTotal = 0.0;
 		
@@ -175,9 +197,9 @@ public class RouteSearch{
 		accumulatingFitness = 0.0;
 		
 		while(selected < MAX_POPULATION_SIZE){
-			if(holder[].contains() = currentPopulationScores[selected]){
+			/*if(holder[].contains() == currentPopulationScores[selected]){
 				break;
-			}
+			}*/
 			accumulatingFitness += currentPopulationScores[selected];
 			if (pointer < accumulatingFitness){
 				break;
@@ -192,11 +214,11 @@ public class RouteSearch{
 		return test;		
 	}
 	
-	 private static int getRandomNumberBetween(int min, int max) {
+	 private  int getRandomNumberBetween(int min, int max) {
         return random.nextInt(max - min) + min;
     }
 
-    public static int getRandomNumberFrom(int min, int max) {
+    public int getRandomNumberFrom(int min, int max) {
         return getRandomNumberBetween(min, max+1);
     }
 	
@@ -299,5 +321,6 @@ public class RouteSearch{
 		}
 			
 	}
+	
 	
 }
