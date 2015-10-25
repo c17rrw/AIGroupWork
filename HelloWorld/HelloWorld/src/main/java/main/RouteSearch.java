@@ -21,6 +21,7 @@ public class RouteSearch{
 	private int iterationNumber;
 	
 	private String[] currentPopulation;
+	private static double[] fitness;
 	
 	private String currentBestGenotype;
 	private int currentBestGenotypeScore;
@@ -50,7 +51,8 @@ public class RouteSearch{
 	private void generateInitialPopulation(Map<Integer, String> m){
 		String cityOrder;
 		currentPopulation = new String[MAX_POPULATION_SIZE];
-		currentBestGenotype = "";		
+		currentBestGenotype = "";	
+		fitness = new double[MAX_POPULATION_SIZE];		
 		for(int j = 0; j < MAX_POPULATION_SIZE; j++){
 			int i = 1;
 			Map<Integer, String> cm = new HashMap<>();
@@ -164,41 +166,32 @@ public class RouteSearch{
 		}
 	}
 	
-	private int rouletteWheelSelect(int[] currentPopulationScores){
-		double fitTotal; 
-		double pointer, accumulatingFitness, randReal;
-		int chromosone, randInt, selected = 0;
-		int test = 0;
-		//int[] holder = new int[MAX_POPULATION_SIZE];
-		
-		fitTotal = 0.0;
-		
-		for(chromosone = 0; chromosone < 10; chromosone++){
-			fitTotal += currentPopulationScores[chromosone];
-		}
-		
-		randInt = getRandomNumberFrom(0, 100000);
-		randReal = randInt / 1000000.0;
-		pointer = fitTotal * randReal;
-		accumulatingFitness = 0.0;
-		
-		while(selected < MAX_POPULATION_SIZE){
-			/*if(holder[].contains() == currentPopulationScores[selected]){
-				break;
-			}*/
-			accumulatingFitness += currentPopulationScores[selected];
-			if (pointer < accumulatingFitness){
-				break;
-			}
-			
-			if (selected != MAX_POPULATION_SIZE -1){
-				selected++;
-			}
-			
-		}
-		
-		return test;		
-	}
+	private int rouletteWheelSelect() {
+        double fitTotal, pointer, accumulatingFitness, randReal;
+        int chromosome, randint, selected = 0;
+
+        fitTotal = 0.0;
+        for (chromosome = 0; chromosome < MAX_POPULATION_SIZE; chromosome++) {
+            fitTotal += fitness[chromosome];
+        }
+
+        randint = getRandomNumberFrom(0, 1000000);
+        randReal = randint / 1000000.0;
+        pointer = fitTotal * randReal;
+        accumulatingFitness = 0.0;
+
+        while (selected < MAX_POPULATION_SIZE) {
+            accumulatingFitness += fitness[selected];
+            if (pointer < accumulatingFitness) {
+                break;
+            }
+
+            if (selected != MAX_POPULATION_SIZE - 1) {
+                selected++;
+            }
+        }
+        return selected;
+    }
 	
 	private int getRandomNumberBetween(int min, int max) {
         return random.nextInt(max - min) + min;
@@ -233,11 +226,20 @@ public class RouteSearch{
 	
 	private String makeChild(String mother, String father){
 		String child;
+		/*
+		int crossoverPoint = random.nextInt(mother.length());
+		child = mother.substring(0, crossoverPoint) +
+				father.substring(crossoverPoint);
+		*/
+		
+		mother = Integer.toString(rouletteWheelSelect());
+		father = Integer.toString(rouletteWheelSelect());
 		
 		int crossoverPoint = random.nextInt(mother.length());
 		child = mother.substring(0, crossoverPoint) +
 				father.substring(crossoverPoint);
-				
+		
+		
 		boolean[] visitedLocations = {false,false,false,false,false,false,false,false};
 		boolean[] visitedTwiceLocations = {false,false,false,false,false,false,false,false};
 		
