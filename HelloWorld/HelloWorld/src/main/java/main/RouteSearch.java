@@ -4,11 +4,7 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-/**TODO.
--Best iteration number *Done
--Print all iterations * Done
--Roulette wheel thing * Done
-*/
+
 /**
 * Class for Route Search Genetic Algorithm.
 **/
@@ -21,13 +17,14 @@ public class RouteSearch{
 	private Random random;
 	
 	private int[][] distancesMatrix;
-	public int numberOfCities = 8;
-	public int iterationNumber = 0;
+	private int numberOfCities = 8;
+	private int iterationNumber;
 	
 	private String[] currentPopulation;
 	
 	private String currentBestGenotype;
 	private int currentBestGenotypeScore;
+	private int iterationWithBestGenotype;
 	
 	private Map<Integer, String> m = new HashMap<Integer, String>();
 		
@@ -41,6 +38,7 @@ public class RouteSearch{
 		generateInitialPopulation(m);
 		currentBestGenotype = "";
 		currentBestGenotypeScore = -1;
+		iterationNumber = 0;
 	}
 	
 	/* This method is taking the Map created in the citList method at the bottom of class,
@@ -88,6 +86,7 @@ public class RouteSearch{
 	}
 	
 	public String[] iterateOneStep(){
+		iterationNumber++;
 		int[] currentPopulationScores = calculateFitnessOfAll(currentPopulation);
 		String[] fittestSolutions = keepFittestSolutions(currentPopulation, currentPopulationScores);
 		String[] newSolutions = generateChildren(fittestSolutions);
@@ -103,8 +102,17 @@ public class RouteSearch{
 			if(currentScore>currentBestGenotypeScore){
 				currentBestGenotypeScore = currentScore;
 				currentBestGenotype = s;
+				iterationWithBestGenotype = iterationNumber;
 			}
 		}
+	}
+	
+	public int getCurrentIterationNumber(){
+		return iterationNumber;
+	}
+	
+	public int getBestIterationNumber(){
+		return iterationWithBestGenotype;
 	}
 	
 	public String getCurrentBestGenotype(){
@@ -138,7 +146,6 @@ public class RouteSearch{
 	private int calculateFitnessOfOne(String solution){
 		String[] routeLocationStrings = solution.split("");
 		int totalDistance = 0;
-		//Start at 2 because .split("") produces empty string at position 0
 		for(int i = 1; i < routeLocationStrings.length; i++){
 			int currentLocation = Integer.parseInt(routeLocationStrings[i]);
 			int previousLocation = Integer.parseInt(routeLocationStrings[i-1]);
@@ -147,38 +154,17 @@ public class RouteSearch{
 		return (totalDistance==0) ? 1000001 : (int) ((1.0 / totalDistance) * 100000);
 	}
 	
-	private void printAllIterations(String[] currentPopulation){
-		
-		String[] copy = new String[currentPopulation.length];
-		
-		System.arraycopy(currentPopulation, 0, copy, 0, copy.length);
-
-		for(int count = 0; count < MAX_POPULATION_SIZE; count++){
-		
-			for (int count2 = 0; count2 < copy.length; count2++){
-				System.out.print("-> " + copy[count2]);
+	public void printAllIterations(){
+		for(int o = 0; o < currentPopulation.length; o++){
+			String[] routeLocationStrings = currentPopulation[o].split("");
+			for(int i = 0; i < routeLocationStrings.length-1; i++){
+				System.out.print(m.get(Integer.parseInt(routeLocationStrings[i]))+"->");
 			}
+			System.out.println(m.get(Integer.parseInt(routeLocationStrings[routeLocationStrings.length-1])));
 		}
 	}
 	
-	private static int bestIterationNumber(int iterationNumber){	
-			
-			iterationNumber = Start.getIterationNumber();
-			
-			int bestIteration = iterationNumber;
-				
-		return bestIteration;
-	}
-	
-	
-	/**TODO.
-		Roulette wheel?
-	**/
-	
-	private  int rouletteWheelSelect(int[] currentPopulationScores){
-		
-		
-		
+	private int rouletteWheelSelect(int[] currentPopulationScores){
 		double fitTotal; 
 		double pointer, accumulatingFitness, randReal;
 		int chromosone, randInt, selected = 0;
@@ -214,7 +200,7 @@ public class RouteSearch{
 		return test;		
 	}
 	
-	 private  int getRandomNumberBetween(int min, int max) {
+	private int getRandomNumberBetween(int min, int max) {
         return random.nextInt(max - min) + min;
     }
 
@@ -321,6 +307,4 @@ public class RouteSearch{
 		}
 			
 	}
-	
-	
 }

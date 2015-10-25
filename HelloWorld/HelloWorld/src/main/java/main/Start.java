@@ -18,8 +18,6 @@ visits every city and takes the shortest distance.
 	private static final int[] ITERATION_AMOUNTS = {10, 50, 100, 500, 1000};
 	
 	private static int[][] distancesMatrix;
-	
-	private static int iterationNumber = 0;
 
 	private static int defaultPopulationCount;
 	private static double defaultMutationChance;
@@ -33,12 +31,11 @@ visits every city and takes the shortest distance.
 		defaultIterationAmount = ITERATION_AMOUNTS[1];
 		distancesMatrix = readDistancesMatrixFromFile(DISTANCES_MATRIX_LOCATION);
 		printCSVHeader();
-		runEntireGASuiteForStatistics();
+		//runEntireGASuiteForStatistics();
 		runTheGAWithParams(defaultPopulationCount, defaultMutationChance, defaultFitnessKeepingAmount, defaultIterationAmount);
 	}
 	
-	/**TODO.
-		Read the distance matrix in and convert it into a 2-d array
+	/**	Read the distance matrix in and convert it into a 2-d array
 		e.g. [0][1] = position of 1st item on row 0 of text file = 179
 		To read: Select row as FROM, Select column as TO
 		[0][1] is the distance from city 0 to city 1
@@ -117,7 +114,8 @@ visits every city and takes the shortest distance.
 		RouteSearch routeSearch = new RouteSearch(maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep, distancesMatrix);
 		for(int k = 0; k < iterationCount; k++){
 			routeSearch.iterateOneStep();
-			iterationNumber++;
+			System.out.println("Population for Iteration: "+routeSearch.getCurrentIterationNumber());
+			routeSearch.printAllIterations();
 		}
 		printResultForCSV( maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep, 
 				iterationCount, routeSearch.getCurrentBestGenotype(), 
@@ -143,11 +141,5 @@ visits every city and takes the shortest distance.
 				","+bestGenotype+
 				","+bestGenotypeScore+
 				"," + totalTime);
-	}
-	
-	public static int getIterationNumber(){
-		return iterationNumber;
-	}
-	
-	
+	}	
 }
