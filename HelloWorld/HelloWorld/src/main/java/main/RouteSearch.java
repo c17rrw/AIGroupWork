@@ -92,10 +92,7 @@ public class RouteSearch{
 		String[] newSolutions = generateChildren(fittestSolutions);
 		currentPopulation = concatenateArrays(fittestSolutions, newSolutions);
 		detectCurrentBestGenotype();
-<<<<<<< HEAD
 		for(String s : fittestSolutions){System.out.println(s);}
-=======
->>>>>>> origin/master
 		return currentPopulation;
 	}
 	
@@ -153,7 +150,7 @@ public class RouteSearch{
 		Roulette wheel?
 	**/
 	
-	private static int rouletteWheelSelect(){
+	private  int rouletteWheelSelect(){
 		
 		
 		
@@ -161,7 +158,7 @@ public class RouteSearch{
 		double pointer, accumulatingFitness, randReal;
 		int chromosone, randInt, selected = 0;
 		int test = 0;
-		int[] holder = new int[MAX_POPULATION_SIZE];
+		//int[] holder = new int[MAX_POPULATION_SIZE];
 		
 		fitTotal = 0.0;
 		
@@ -175,9 +172,9 @@ public class RouteSearch{
 		accumulatingFitness = 0.0;
 		
 		while(selected < MAX_POPULATION_SIZE){
-			if(holder[].contains() = currentPopulationScores[selected]){
+			/*if(holder[].contains() == currentPopulationScores[selected]){
 				break;
-			}
+			}*/
 			accumulatingFitness += currentPopulationScores[selected];
 			if (pointer < accumulatingFitness){
 				break;
@@ -192,11 +189,11 @@ public class RouteSearch{
 		return test;		
 	}
 	
-	 private static int getRandomNumberBetween(int min, int max) {
+	 private  int getRandomNumberBetween(int min, int max) {
         return random.nextInt(max - min) + min;
     }
 
-    public static int getRandomNumberFrom(int min, int max) {
+    public int getRandomNumberFrom(int min, int max) {
         return getRandomNumberBetween(min, max+1);
     }
 	
