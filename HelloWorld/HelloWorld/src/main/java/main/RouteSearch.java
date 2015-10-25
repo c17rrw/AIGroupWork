@@ -1,6 +1,3 @@
-//package routeSearch1;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -9,37 +6,43 @@ import java.util.Random;
 * Class for Route Search Genetic Algorithm.
 **/
 public class RouteSearch{
-	 
-	private int MAX_POPULATION_SIZE;
-	private int KEEP_TOP_N_FITTEST_SOLUTIONS;
-	private double MUTATION_CHANCE;
 	
-	private Random random;
+	private final int MAX_SCORE = 100000;
+	private final String GENOTYPE_START_END_CODE = "2";
 	
-	private int[][] distancesMatrix;
-	private int numberOfCities = 8;
+	private final int MAX_POPULATION_SIZE;
+	private final int KEEP_TOP_N_FITTEST_SOLUTIONS;
+	private final double MUTATION_CHANCE;
+	private final int[][] DISTANCES_MATRIX;
+	private final Map<Integer, String> CITIES;
+	private final int NUMBER_OF_CITIES;
+	private final Random random;
+	
 	private int iterationNumber;
-	
 	private String[] currentPopulation;
-	private static double[] fitness;
+	private int[] currentPopulationScores;
 	
 	private String currentBestGenotype;
 	private int currentBestGenotypeScore;
 	private int iterationWithBestGenotype;
 	
-	private Map<Integer, String> m = new HashMap<Integer, String>();
 		
-	public RouteSearch(int maxPopulationSize, double mutationChance, double keepTopNFittestSolutions, int[][] distancesMatrix){
+	public RouteSearch(int maxPopulationSize, double mutationChance, double keepTopNFittestSolutions, int[][] distancesMatrix, Map<Integer, String> citiesMap){
 		MAX_POPULATION_SIZE = maxPopulationSize;
-		MUTATION_CHANCE = mutationChance;
 		KEEP_TOP_N_FITTEST_SOLUTIONS = (int) (maxPopulationSize * keepTopNFittestSolutions);
-		this.distancesMatrix = distancesMatrix;
+		MUTATION_CHANCE = mutationChance;
+		DISTANCES_MATRIX = distancesMatrix;
+		CITIES = citiesMap;
+		NUMBER_OF_CITIES = CITIES.size();
 		random = new Random();
-		createCityMap();
-		generateInitialPopulation(m);
+		
+		iterationNumber = 0;
+		generateInitialPopulation();
+		calculateFitnessOfCurrentPopulation();
+		
 		currentBestGenotype = "";
 		currentBestGenotypeScore = -1;
-		iterationNumber = 0;
+		iterationWithBestGenotype = -1;
 	}
 	
 	/* This method is taking the Map created in the citList method at the bottom of class,
@@ -48,53 +51,36 @@ public class RouteSearch{
 	 * We also initiate the Best GenoType so far to an empty string to ensure the best is taken
 	 * at step one. 
 	 * */
-	private void generateInitialPopulation(Map<Integer, String> m){
+	private void generateInitialPopulation(){
 		String cityOrder;
 		currentPopulation = new String[MAX_POPULATION_SIZE];
+		currentPopulationScores = new int[MAX_POPULATION_SIZE];
 		currentBestGenotype = "";	
-		fitness = new double[MAX_POPULATION_SIZE];		
 		for(int j = 0; j < MAX_POPULATION_SIZE; j++){
 			int i = 1;
 			Map<Integer, String> cm = new HashMap<>();
-			cm.putAll(m);
-			cityOrder = "2";
+			cm.putAll(CITIES);
+			cityOrder = GENOTYPE_START_END_CODE;
 			while(!cm.isEmpty()){
-				int r = random.nextInt(numberOfCities);
+				int r = random.nextInt(NUMBER_OF_CITIES);
 				if(cm.get(r) != null){
 					cityOrder += (r!=2) ? r : "";
 					cm.remove(r);
 					i++;
 				}
 			}
-			cityOrder += "2";
+			cityOrder += GENOTYPE_START_END_CODE;
 			currentPopulation[j] = cityOrder;
 		}
 	}
 	
-	private Map<Integer,String> createCityMap(){
-		try{
-			FileReader fr = new FileReader("cities.txt");
-			BufferedReader br = new BufferedReader(fr);
-			for(int marker = 0; marker < 8; marker++ ){
-				String nextCity = br.readLine();
-				m.put(marker, nextCity);
-			}
-			br.close();
-			fr.close();
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		return m;
-	}
-	
 	public String[] iterateOneStep(){
 		iterationNumber++;
-		int[] currentPopulationScores = calculateFitnessOfAll(currentPopulation);
-		String[] fittestSolutions = keepFittestSolutions(currentPopulation, currentPopulationScores);
-		String[] newSolutions = generateChildren(fittestSolutions);
+		currentPopulationScores = calculateFitnessOfCurrentPopulation();
+		String[] fittestSolutions = keepFittestSolutions();
+		String[] newSolutions = generateChildren();
 		currentPopulation = concatenateArrays(fittestSolutions, newSolutions);
 		detectCurrentBestGenotype();
-		//for(String s : fittestSolutions){System.out.println(s);}
 		return currentPopulation;
 	}
 	
@@ -128,19 +114,19 @@ public class RouteSearch{
 	private String[] concatenateArrays(String[] a1, String[] a2){
 		String[] fullArray = new String[a1.length+a2.length];
 		int fullArrayPos = 0;
-		for(int i = 0; i < a1.length; i++){
-			fullArray[fullArrayPos++] = a1[i];
+		for (String item : a1) {
+			fullArray[fullArrayPos++] = item;
 		}
-		for(int i = 0; i < a2.length; i++){
-			fullArray[fullArrayPos++] = a2[i];
+		for (String item : a2) {
+			fullArray[fullArrayPos++] = item;
 		}
 		return fullArray;
 	}
 	
-	private int[] calculateFitnessOfAll(String[] population){
+	private int[] calculateFitnessOfCurrentPopulation(){
 		int[] populationScores = new int[MAX_POPULATION_SIZE];
-		for(int i = 0; i < population.length; i++){
-			populationScores[i] = calculateFitnessOfOne(population[i]);
+		for(int i = 0; i < currentPopulation.length; i++){
+			populationScores[i] = calculateFitnessOfOne(currentPopulation[i]);
 		}
 		return populationScores;
 	}
@@ -151,46 +137,45 @@ public class RouteSearch{
 		for(int i = 1; i < routeLocationStrings.length; i++){
 			int currentLocation = Integer.parseInt(routeLocationStrings[i]);
 			int previousLocation = Integer.parseInt(routeLocationStrings[i-1]);
-			totalDistance += distancesMatrix[previousLocation][currentLocation];
+			totalDistance += DISTANCES_MATRIX[previousLocation][currentLocation];
 		}
-		return (totalDistance==0) ? 1000001 : (int) ((1.0 / totalDistance) * 100000);
+		return (totalDistance==0) ? (MAX_SCORE+1) : (int) ((1.0 / totalDistance) * MAX_SCORE);
 	}
 	
-	public void printAllIterations(){
-		for(int o = 0; o < currentPopulation.length; o++){
-			String[] routeLocationStrings = currentPopulation[o].split("");
+	public void printCurrentIteration(){
+		for (String genotype : currentPopulation) {
+			String[] routeLocationStrings = genotype.split("");
 			for(int i = 0; i < routeLocationStrings.length-1; i++){
-				System.out.print(m.get(Integer.parseInt(routeLocationStrings[i]))+"->");
+				System.out.print(CITIES.get(Integer.parseInt(routeLocationStrings[i]))+"->");
 			}
-			System.out.println(m.get(Integer.parseInt(routeLocationStrings[routeLocationStrings.length-1])));
+			System.out.println(CITIES.get(Integer.parseInt(routeLocationStrings[routeLocationStrings.length-1])));
 		}
 	}
 	
 	private int rouletteWheelSelect() {
-        double fitTotal, pointer, accumulatingFitness, randReal;
-        int chromosome, randint, selected = 0;
+        double pointer, accumulatingFitness, randomReal;
+        int currentPopulationIndex = 0;
 
-        fitTotal = 0.0;
-        for (chromosome = 0; chromosome < MAX_POPULATION_SIZE; chromosome++) {
-            fitTotal += fitness[chromosome];
+        double fitnessTotalScore = 0.0;
+        for (int currentScore : currentPopulationScores) {
+            fitnessTotalScore += currentScore;
         }
 
-        randint = getRandomNumberFrom(0, 1000000);
-        randReal = randint / 1000000.0;
-        pointer = fitTotal * randReal;
+        randomReal = getRandomNumberFrom(0, 1000000) / 1000000.0;
+        pointer = fitnessTotalScore * randomReal;
         accumulatingFitness = 0.0;
-
-        while (selected < MAX_POPULATION_SIZE) {
-            accumulatingFitness += fitness[selected];
+		
+        while (currentPopulationIndex < MAX_POPULATION_SIZE) {
+            accumulatingFitness += currentPopulationScores[currentPopulationIndex];
             if (pointer < accumulatingFitness) {
                 break;
             }
 
-            if (selected != MAX_POPULATION_SIZE - 1) {
-                selected++;
+            if (currentPopulationIndex != MAX_POPULATION_SIZE - 1) {
+                currentPopulationIndex++;
             }
         }
-        return selected;
+        return currentPopulationIndex;
     }
 	
 	private int getRandomNumberBetween(int min, int max) {
@@ -201,39 +186,38 @@ public class RouteSearch{
         return getRandomNumberBetween(min, max+1);
     }
 	
-	private String[] keepFittestSolutions(String[] population, int[] populationScores){
-		//higher score = better choice = more chance of being picked
-		//sum all scores
-		//assign chance to each of population = score of one / population
-		//make a roulette wheel
-		//array
-		//TEMP SOLUTION TO PREVENT CRASHES ONLY:
+	private String[] keepFittestSolutions(){
+		int[] temporaryPopulationScores = new int[currentPopulationScores.length];
+		System.arraycopy(currentPopulationScores, 0, temporaryPopulationScores, 0, currentPopulationScores.length);
 		String[] fittest = new String[KEEP_TOP_N_FITTEST_SOLUTIONS];
 		for(int i = 0 ; i< KEEP_TOP_N_FITTEST_SOLUTIONS; i++){
-			fittest[i] = population[i];
+			int currentHighest = 0;
+			int currentHighestPosition = 0;
+			for(int j = 0; j<temporaryPopulationScores.length; j++){
+				if(temporaryPopulationScores[j] > currentHighest){
+					currentHighest = temporaryPopulationScores[j];
+					currentHighestPosition = j;
+				}
+			}
+			fittest[i] = currentPopulation[currentHighestPosition];
+			temporaryPopulationScores[currentHighestPosition] = -1;
 		}
 		return fittest;
 	}
 	
-	private String[] generateChildren(String[] parentStock){
+	private String[] generateChildren(){
 		String[] children = new String[MAX_POPULATION_SIZE-KEEP_TOP_N_FITTEST_SOLUTIONS];
 		for(int i = 0; i < children.length; i++){
-			int parentPairPosition = random.nextInt(parentStock.length-1);
-			children[i] = makeChild(parentStock[parentPairPosition], parentStock[parentPairPosition+1]);
+			children[i] = makeChild();
 		}
 		return children;
 	}
 	
-	private String makeChild(String mother, String father){
+	private String makeChild(){
 		String child;
-		/*
-		int crossoverPoint = random.nextInt(mother.length());
-		child = mother.substring(0, crossoverPoint) +
-				father.substring(crossoverPoint);
-		*/
 		
-		mother = Integer.toString(rouletteWheelSelect());
-		father = Integer.toString(rouletteWheelSelect());
+		String mother = currentPopulation[rouletteWheelSelect()];
+		String father = currentPopulation[rouletteWheelSelect()];
 		
 		int crossoverPoint = random.nextInt(mother.length());
 		child = mother.substring(0, crossoverPoint) +
@@ -285,9 +269,9 @@ public class RouteSearch{
 				String numberNextToCurrentInParent = String.valueOf(chosenParent.charAt(positionOfNumberNextToCurrentInParent));
 				int positionToPlaceAt = child.indexOf(numberNextToCurrentInParent);
 				if(positionToPlaceAt < 0){
-					child = child.substring(0, child.length()-1) + i + "2";
+					child = child.substring(0, child.length()-1) + i + GENOTYPE_START_END_CODE;
 				} else if(positionToPlaceAt==0){
-					child = "2" + i + child.substring(1);
+					child = GENOTYPE_START_END_CODE + i + child.substring(1);
 				} else {
 					child = child.substring(0, positionToPlaceAt) + i + child.substring(positionToPlaceAt);
 				}

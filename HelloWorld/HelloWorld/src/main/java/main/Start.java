@@ -1,5 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Start {
 
@@ -11,6 +13,7 @@ visits every city and takes the shortest distance.
 
 **************************************************/
 	private static final String DISTANCES_MATRIX_LOCATION = "route.alt.txt";
+	private static final String CITIES_LIST_LOCATION = "cities.txt";
 	private static final int REPEAT_THIS_GA_FOR_STATISTICS = 50;
 	private static final int[] MAXIMUM_POPULATION_COUNTS = {10, 50, 100, 500, 1000, 5000, 10000};
 	private static final double[] MUTATION_CHANCES = {0.001, 0.005, 0.01, 0.05, 0.1, 0.25};
@@ -18,6 +21,7 @@ visits every city and takes the shortest distance.
 	private static final int[] ITERATION_AMOUNTS = {10, 50, 100, 500, 1000};
 	
 	private static int[][] distancesMatrix;
+	private static Map<Integer, String> citiesMap;
 
 	private static int defaultPopulationCount;
 	private static double defaultMutationChance;
@@ -30,10 +34,10 @@ visits every city and takes the shortest distance.
 		defaultFitnessKeepingAmount = FITNESS_KEEPING_AMOUNT[1];
 		defaultIterationAmount = ITERATION_AMOUNTS[1];
 		distancesMatrix = readDistancesMatrixFromFile(DISTANCES_MATRIX_LOCATION);
+		citiesMap = readCitiesListFromFile(CITIES_LIST_LOCATION);
 		printCSVHeader();
-		runEntireGASuiteForStatistics();
+		//runEntireGASuiteForStatistics();
 		runTheGAWithParams(defaultPopulationCount, defaultMutationChance, defaultFitnessKeepingAmount, defaultIterationAmount);
-		
 	}
 	
 	/**	Read the distance matrix in and convert it into a 2-d array
@@ -89,6 +93,23 @@ visits every city and takes the shortest distance.
 		return integerArrayData;
 	}
 	
+	private static Map<Integer,String> readCitiesListFromFile(String location){
+		Map<Integer,String> newCitiesMap = new HashMap<>();
+		try{
+			FileReader fr = new FileReader(location);
+			BufferedReader br = new BufferedReader(fr);
+			for(int marker = 0; marker < 8; marker++ ){
+				String nextCity = br.readLine();
+				newCitiesMap.put(marker, nextCity);
+			}
+			br.close();
+			fr.close();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return newCitiesMap;
+	}
+	
 	private static void runEntireGASuiteForStatistics(){
 		for(int maxPopulationSize : MAXIMUM_POPULATION_COUNTS){
 			repeatTheGAForStatisticsWithTheseParams(maxPopulationSize, defaultMutationChance, defaultFitnessKeepingAmount, defaultIterationAmount);
@@ -112,11 +133,11 @@ visits every city and takes the shortest distance.
 
 	private static void runTheGAWithParams(int maxPopulationSize, double mutationChance, double amountOfFittestPopulationToKeep, int iterationCount){
 		long gaStart = System.currentTimeMillis();
-		RouteSearch routeSearch = new RouteSearch(maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep, distancesMatrix);
+		RouteSearch routeSearch = new RouteSearch(maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep, distancesMatrix, citiesMap);
 		for(int k = 0; k < iterationCount; k++){
 			routeSearch.iterateOneStep();
-			System.out.println("Population for Iteration: "+routeSearch.getCurrentIterationNumber());
-			routeSearch.printAllIterations();
+			//System.out.println("Population for Iteration: "+routeSearch.getCurrentIterationNumber());
+			//routeSearch.printCurrentIteration();
 		}
 		printResultForCSV( maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep, 
 				iterationCount, routeSearch.getCurrentBestGenotype(), 
