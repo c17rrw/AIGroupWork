@@ -29,14 +29,14 @@ visits every city and takes the shortest distance.
 	private static int defaultIterationAmount;
 	
 	public static void main(String[] s) {
-		defaultPopulationCount = MAXIMUM_POPULATION_COUNTS[1];
+		defaultPopulationCount = MAXIMUM_POPULATION_COUNTS[3];
 		defaultMutationChance = MUTATION_CHANCES[1];
 		defaultFitnessKeepingAmount = FITNESS_KEEPING_AMOUNT[1];
-		defaultIterationAmount = ITERATION_AMOUNTS[1];
+		defaultIterationAmount = ITERATION_AMOUNTS[2];
 		distancesMatrix = readDistancesMatrixFromFile(DISTANCES_MATRIX_LOCATION);
 		citiesMap = readCitiesListFromFile(CITIES_LIST_LOCATION);
 		printCSVHeader();
-		//runEntireGASuiteForStatistics();
+//		runEntireGASuiteForStatistics();
 		runTheGAWithParams(defaultPopulationCount, defaultMutationChance, defaultFitnessKeepingAmount, defaultIterationAmount);
 	}
 	
