@@ -12,6 +12,11 @@ bike tour.  We will base the best result as one that
 visits every city and takes the shortest distance.  
 
 **************************************************/
+	private static final int DEMO_MODE = 2;
+	// 0 = Run Entire GA suite for CSV results
+	// 1 = Run demo with iterations listed and final result
+	// 2 = Run demo with only final result
+	
 	private static final String DISTANCES_MATRIX_LOCATION = "route.alt.txt";
 	private static final String CITIES_LIST_LOCATION = "cities.txt";
 	private static final int REPEAT_THIS_GA_FOR_STATISTICS = 50;
@@ -35,9 +40,12 @@ visits every city and takes the shortest distance.
 		defaultIterationAmount = ITERATION_AMOUNTS[2];
 		distancesMatrix = readDistancesMatrixFromFile(DISTANCES_MATRIX_LOCATION);
 		citiesMap = readCitiesListFromFile(CITIES_LIST_LOCATION);
-		printCSVHeader();
-//		runEntireGASuiteForStatistics();
-		runTheGAWithParams(defaultPopulationCount, defaultMutationChance, defaultFitnessKeepingAmount, defaultIterationAmount);
+		if(DEMO_MODE==0){
+			printCSVHeader();
+			runEntireGASuiteForStatistics();
+		} else {
+			runTheGAWithParams(defaultPopulationCount, defaultMutationChance, defaultFitnessKeepingAmount, defaultIterationAmount);
+		}
 	}
 	
 	/**	Read the distance matrix in and convert it into a 2-d array
@@ -136,14 +144,33 @@ visits every city and takes the shortest distance.
 		RouteSearch routeSearch = new RouteSearch(maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep, distancesMatrix, citiesMap);
 		for(int k = 0; k < iterationCount; k++){
 			routeSearch.iterateOneStep();
-			//System.out.println("Population for Iteration: "+routeSearch.getCurrentIterationNumber());
-			//routeSearch.printCurrentIteration();
+			if (DEMO_MODE==1){
+				System.out.println("Population for Iteration: "+routeSearch.getCurrentIterationNumber());
+				routeSearch.printCurrentIteration();
+			}
 		}
-		printResultForCSV( maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep, 
-				iterationCount, routeSearch.getCurrentBestGenotype(), 
-				routeSearch.getCurrentBestGenotypeScore(), (System.currentTimeMillis()-gaStart));
+		if(DEMO_MODE==0){
+			printResultForCSV( maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep, 
+					iterationCount, routeSearch.getCurrentBestGenotype(), 
+					routeSearch.getCurrentBestGenotypeScore(), (System.currentTimeMillis()-gaStart));
+		} else {
+			printResultForDemo( maxPopulationSize, mutationChance, amountOfFittestPopulationToKeep, 
+					iterationCount, routeSearch.getCurrentBestGenotype(), 
+					routeSearch.getCurrentBestGenotypeScore(), (System.currentTimeMillis()-gaStart), routeSearch.getCurrentBestGenotypeAsRoute());
+		}
 	}
 	
+	private static void printResultForDemo(int maxPopulationSize, double mutationChance, double amountOfFittestPopulationToKeep, int iterationCount, String bestGenotype, int bestGenotypeScore, long totalTime, String bestRoute){
+		System.out.println(
+				"Max Pop Size: "+maxPopulationSize+
+				"\t Mutation Chance: "+mutationChance+
+				"\t Iterations: "+iterationCount+
+				"\t Fittest Kept: "+amountOfFittestPopulationToKeep+
+				"\t Best: "+bestGenotype+
+				" <"+bestGenotypeScore+
+				">\t Time: " + totalTime+
+				"\n Best Route: " + bestRoute);
+	}
 	private static void printCSVHeader(){
 		System.out.println(
 				"maxPopulationSize,"+

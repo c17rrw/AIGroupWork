@@ -111,6 +111,16 @@ public class RouteSearch{
 		return calculateFitnessOfOne(currentBestGenotype);
 	}
 	
+	public String getCurrentBestGenotypeAsRoute(){
+		String result = "";
+		String[] routeLocationStrings = getCurrentBestGenotype().split("");
+		for(int i = 0; i < routeLocationStrings.length-1; i++){
+			result += CITIES.get(Integer.parseInt(routeLocationStrings[i]))+"->";
+		}
+		result += CITIES.get(Integer.parseInt(routeLocationStrings[routeLocationStrings.length-1]));
+		return result;
+	}
+	
 	private String[] concatenateArrays(String[] a1, String[] a2){
 		String[] fullArray = new String[a1.length+a2.length];
 		int fullArrayPos = 0;
@@ -145,6 +155,7 @@ public class RouteSearch{
 	public void printCurrentIteration(){
 		for (String genotype : currentPopulation) {
 			String[] routeLocationStrings = genotype.split("");
+			System.out.print("<"+calculateFitnessOfOne(genotype)+"> ");
 			for(int i = 0; i < routeLocationStrings.length-1; i++){
 				System.out.print(CITIES.get(Integer.parseInt(routeLocationStrings[i]))+"->");
 			}
